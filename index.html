@@ -37,7 +37,7 @@
             --title-size: 18px;
             --anim-speed: 20s;
             --global-font: 'Poppins', sans-serif;
-            --ui-padding: 20px; /* Density Control */
+            --ui-padding: 20px;
             
             /* LIST & LETTER SETTINGS */
             --list-item-height: 80px;
@@ -47,10 +47,10 @@
             --l-font: 'Noto Sans Tamil', sans-serif;
             --l-size: 22px;
             --l-height: 2.2;
-            --l-align: center; 
+            --l-align: left; 
             --l-bg: #ffffff;
             --l-text: #2d3436;
-            --l-max-width: 800px;
+            --l-max-width: 900px;
             --l-spacing: 0px;
             --l-transform: none;
         }
@@ -91,7 +91,7 @@
         /* --- HEADER (Desktop) --- */
         header {
             background: var(--surface); 
-            padding: 20px 4%; /* Increased side padding */
+            padding: 20px 4%; 
             position: sticky; top: 0; z-index: 100;
             box-shadow: var(--shadow);
             border-bottom: 1px solid var(--border);
@@ -116,21 +116,23 @@
         .mobile-nav {
             display: flex; position: fixed; bottom: 0; left: 0; width: 100%;
             background: var(--surface); border-top: 1px solid var(--border);
-            padding: 12px 20px; justify-content: space-around; z-index: 1000;
+            padding: 8px 15px; 
+            justify-content: space-around; z-index: 1000;
             box-shadow: 0 -5px 20px rgba(0,0,0,0.05);
             backdrop-filter: blur(10px);
+            height: 60px;
         }
         @media (min-width: 768px) { .mobile-nav { display: none; } body { padding-bottom: 0; } }
         
         .m-nav-item {
-            display: flex; flex-direction: column; align-items: center; gap: 5px;
-            color: var(--text-sub); font-size: 11px; font-weight: 600; cursor: pointer;
-            width: 65px; transition: 0.2s;
+            display: flex; flex-direction: column; align-items: center; gap: 3px;
+            color: var(--text-sub); font-size: 10px; font-weight: 600; cursor: pointer;
+            width: 60px; transition: 0.2s; justify-content: center;
         }
-        .m-nav-item i { font-size: 22px; margin-bottom: 2px; }
-        .m-nav-item.active { color: var(--primary); transform: translateY(-3px); }
+        .m-nav-item i { font-size: 20px; }
+        .m-nav-item.active { color: var(--primary); transform: translateY(-2px); }
 
-        /* Search & Filter Bar */
+        /* Search Row */
         .search-row { 
             max-width: 1400px; margin: 20px auto 0; display: flex; gap: 15px; align-items: center; 
         }
@@ -166,7 +168,7 @@
         .cat-chip:hover { border-color: var(--primary); color: var(--primary); transform: translateY(-2px); }
         .cat-chip.active { background: var(--primary); color: white; border-color: var(--primary); box-shadow: 0 6px 15px rgba(108, 92, 231, 0.3); }
 
-        /* --- ADVANCED APP SETTINGS MODAL --- */
+        /* --- SETTINGS MODAL --- */
         #settings-modal {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.6); z-index: 2000; align-items: center; justify-content: center;
@@ -181,7 +183,7 @@
         @keyframes popUp { from{transform:scale(0.9) translateY(20px); opacity:0;} to{transform:scale(1) translateY(0); opacity:1;} }
 
         .s-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; border-bottom: 2px solid var(--border); padding-bottom: 15px; }
-        .s-title { font-size: 20px; font-weight: 800; color: var(--primary); }
+        .s-title { font-size: 22px; font-weight: 800; color: var(--primary); }
         
         .s-section-title { 
             font-size: 12px; font-weight: 800; color: var(--text-sub); text-transform: uppercase; 
@@ -212,6 +214,15 @@
         .theme-row { display: flex; gap: 15px; justify-content: space-between; }
         .theme-circle { width: 45px; height: 45px; border-radius: 50%; cursor: pointer; border: 3px solid transparent; transition: 0.2s; position: relative; }
         .theme-circle.active { transform: scale(1.15); border-color: var(--text-main); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+
+        .reset-btn {
+            width: 100%; padding: 14px; 
+            border: 2px dashed var(--primary); color: var(--primary);
+            background: rgba(108, 92, 231, 0.05); border-radius: 14px; 
+            font-weight: 700; cursor: pointer; margin-top: 30px; font-size: 14px;
+            transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px;
+        }
+        .reset-btn:hover { background: var(--primary); color: white; border-style: solid; }
 
         .view-settings { display: none; animation: fadeIn 0.3s; }
         .view-settings.active { display: block; }
@@ -337,7 +348,7 @@
 
         /* Improved Lyrics Settings Popup (Glassmorphism) */
         #ls-panel {
-            display: none; position: absolute; top: 80px; right: 20px; width: 340px;
+            display: none; position: absolute; top: 70px; right: 20px; width: 300px;
             background: rgba(255, 255, 255, 0.95); color: #333; padding: 25px;
             border-radius: 24px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); z-index: 20;
             animation: fadeIn 0.2s; border: 1px solid rgba(0,0,0,0.1);
@@ -346,32 +357,37 @@
         [data-theme="dark"] #ls-panel { background: rgba(30, 30, 30, 0.95); color: #fff; border: 1px solid #444; }
         
         .ls-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
-        .ls-label { font-size: 11px; font-weight: 800; opacity: 0.7; text-transform: uppercase; letter-spacing: 0.5px; }
-        .ls-grp { display: flex; gap: 5px; background: rgba(0,0,0,0.05); padding: 4px; border-radius: 12px; flex-grow: 1; margin-left: 10px; }
+        .ls-label { font-size: 11px; font-weight: 800; color: var(--text-sub); text-transform: uppercase; letter-spacing: 0.5px; }
+        .ls-grp { display: flex; gap: 5px; background: rgba(0,0,0,0.05); padding: 4px; border-radius: 12px; width: 100%; }
         .ls-b { flex: 1; padding: 8px; border: none; background: transparent; cursor: pointer; color: inherit; border-radius: 8px; font-size: 14px; font-weight: 600; transition: 0.2s; }
         .ls-b:hover { background: rgba(0,0,0,0.05); }
         .ls-b.active { background: var(--primary); color: white; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
 
         /* Carousel Related Songs */
-        .rel-sec { background: rgba(0,0,0,0.03); padding: 60px 4%; border-top: 1px solid var(--border); }
-        .rel-title { font-size: 22px; font-weight: 800; color: var(--primary); margin-bottom: 30px; border-left: 6px solid var(--primary); padding-left: 20px; }
+        .rel-sec { background: rgba(0,0,0,0.03); padding: 60px 5%; border-top: 1px solid var(--border); }
+        .rel-title { font-size: 20px; font-weight: 800; color: var(--primary); margin-bottom: 25px; border-left: 6px solid var(--primary); padding-left: 20px; }
         
         .carousel-wrap { overflow: hidden; width: 100%; position: relative; padding: 10px 0; }
-        .carousel-track { display: flex; gap: 20px; animation: scrollLeft 60s linear infinite; width: max-content; }
+        .carousel-track { display: flex; gap: 20px; animation: scrollLeft 40s linear infinite; width: max-content; }
         .carousel-track:hover { animation-play-state: paused; }
         @keyframes scrollLeft { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
         
         .rel-card {
-            min-width: 240px; width: 240px; background: var(--card-bg); 
+            min-width: 250px; width: 250px; background: var(--card-bg); 
             border-radius: 20px; overflow: hidden; box-shadow: 0 10px 20px rgba(0,0,0,0.05);
             cursor: pointer; transition: 0.3s; border: 1px solid var(--border);
             display: flex; flex-direction: column;
         }
         .rel-card:hover { transform: translateY(-8px) scale(1.02); box-shadow: 0 15px 35px rgba(0,0,0,0.15); border-color: var(--primary); }
-        .rel-cover { height: 140px; display: flex; align-items: center; justify-content: center; color: white; font-size: 12px; text-align: center; padding: 15px; background-size: 200%; animation: grad 8s infinite; }
+        .rel-cover { height: 130px; display: flex; align-items: center; justify-content: center; color: white; font-size: 11px; text-align: center; padding: 15px; background-size: 200%; animation: grad 8s infinite; }
         .rel-info { padding: 15px; }
-        .rel-t { font-size: 15px; font-weight: 700; margin-bottom: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--text-main); }
+        .rel-t { font-size: 15px; font-weight: 700; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--text-main); }
         .rel-s { font-size: 12px; color: var(--text-sub); }
+
+        /* Footer */
+        .app-footer { background: #2d3436; color: #dfe6e9; padding: 50px 20px; text-align: center; margin-top: auto; }
+        .f-social a { color: var(--primary); font-size: 24px; margin: 0 15px; text-decoration: none; transition: 0.2s; }
+        .f-social a:hover { color: white; transform: scale(1.2); display: inline-block; }
 
     </style>
 </head>
@@ -393,7 +409,7 @@
         <div class="search-row">
             <div class="search-box">
                 <i class="fas fa-search" style="color:#aaa;"></i>
-                <input type="text" id="inp-search" placeholder="Search song lyrics (e.g. Aatma)..." onkeyup="filterSongs()">
+                <input type="text" id="inp-search" placeholder="Search lyrics (e.g. Aatma)..." onkeyup="filterSongs()">
             </div>
             <button class="settings-btn" onclick="openSettings()"><i class="fas fa-sliders-h"></i></button>
         </div>
@@ -410,6 +426,17 @@
 
     <div id="container"></div>
 
+    <footer class="app-footer">
+        <h4 style="margin-top:0; color:white; font-size:18px;">Kirubai Payanam</h4>
+        <p style="font-size:13px; color:#b2bec3; max-width:600px; margin: 10px auto;">Sing unto the Lord a new song, for He has done marvelous things.</p>
+        <div class="f-social">
+            <a href="#"><i class="fab fa-youtube"></i></a>
+            <a href="#"><i class="fab fa-facebook"></i></a>
+            <a href="#"><i class="fab fa-instagram"></i></a>
+        </div>
+        <p style="font-size:12px; opacity:0.6; margin-top:30px;">&copy; 2025 Praise & Worship Team.</p>
+    </footer>
+
     <!-- Mobile Bottom Navigation -->
     <div class="mobile-nav">
         <div class="m-nav-item active" onclick="setView('letter'); updateMobileNav(this)"><i class="fas fa-font"></i> A-Z</div>
@@ -418,7 +445,7 @@
         <div class="m-nav-item" onclick="openSettings()"><i class="fas fa-cog"></i> Settings</div>
     </div>
 
-    <!-- ADVANCED APP SETTINGS MODAL -->
+    <!-- APP SETTINGS MODAL -->
     <div id="settings-modal" onclick="if(event.target==this)closeSettings()">
         <div class="settings-box">
             <div class="s-header">
@@ -426,33 +453,6 @@
                 <i class="fas fa-times" onclick="closeSettings()" style="cursor:pointer; font-size:20px;"></i>
             </div>
             
-            <div class="s-section-title"><i class="fas fa-eye"></i> Appearance</div>
-            
-            <div class="s-item">
-                <div class="s-row"><span class="s-label">UI Density</span></div>
-                <div class="ls-grp">
-                    <button class="ls-b active" onclick="setDensity('comfortable', this)">Comfortable</button>
-                    <button class="ls-b" onclick="setDensity('compact', this)">Compact</button>
-                </div>
-            </div>
-
-            <div class="s-item">
-                <div class="s-row"><span class="s-label">Font Family</span></div>
-                <div class="ls-grp">
-                    <button class="ls-b active" onclick="setGlobalFont('Poppins', this)">Poppins</button>
-                    <button class="ls-b" onclick="setGlobalFont('sans-serif', this)">System</button>
-                </div>
-            </div>
-
-            <div class="s-item">
-                <div class="s-row"><span class="s-label">Background Style</span></div>
-                <div class="ls-grp">
-                    <button class="ls-b active" onclick="setBg('blobs', this)">Blobs</button>
-                    <button class="ls-b" onclick="setBg('simple', this)">Simple</button>
-                </div>
-            </div>
-
-            <!-- View Specifics -->
             <div id="set-grid" class="view-settings">
                 <div class="s-section-title"><i class="fas fa-th-large"></i> Grid Options</div>
                 <div class="s-item"><div class="s-row"><span class="s-label">Card Width</span> <span class="s-val" id="disp-w">280px</span></div><input type="range" min="150" max="400" value="280" oninput="upCSS('--card-width', this.value+'px', 'disp-w')"></div>
@@ -470,6 +470,15 @@
                 <div class="s-item"><div class="s-row"><span class="s-label">Font Size</span> <span class="s-val" id="disp-fs">16px</span></div><input type="range" min="12" max="24" value="16" oninput="upCSS('--letter-font-size', this.value+'px', 'disp-fs')"></div>
             </div>
 
+            <div class="s-section-title"><i class="fas fa-eye"></i> Appearance</div>
+            <div class="s-item">
+                <div class="s-row"><span class="s-label">Font Style</span></div>
+                <div class="ls-grp">
+                    <button class="ls-b active" onclick="setGlobalFont('Poppins', this)">Poppins</button>
+                    <button class="ls-b" onclick="setGlobalFont('sans-serif', this)">System</button>
+                </div>
+            </div>
+            
             <div class="s-section-title"><i class="fas fa-sliders-h"></i> Theme</div>
             <div class="s-item">
                 <div class="theme-row">
@@ -481,10 +490,7 @@
                 </div>
             </div>
             <div class="s-item">
-                <div class="s-row">
-                    <span class="s-label">Dark Mode</span>
-                    <div class="toggle"><input type="checkbox" onchange="toggleDark(this.checked)"><span class="slider"></span></div>
-                </div>
+                <div class="s-row"><span class="s-label">Dark Mode</span><div class="toggle"><input type="checkbox" onchange="toggleDark(this.checked)"><span class="slider"></span></div></div>
             </div>
             
             <button class="reset-btn" onclick="location.reload()"><i class="fas fa-undo"></i> Reset All Settings</button>
@@ -522,7 +528,7 @@
                 <div class="ls-grp"><button class="ls-b" onclick="adjL('sp', -1)">-</button><button class="ls-b" onclick="adjL('sp', 1)">+</button></div>
             </div>
             <div class="ls-row">
-                <span class="ls-label">Style</span> 
+                <span class="ls-label">Transform</span> 
                 <div class="ls-grp">
                     <button class="ls-b" onclick="adjL('tr', 'uppercase')">AA</button>
                     <button class="ls-b active" onclick="adjL('tr', 'none')">Aa</button>
@@ -531,8 +537,8 @@
             <div class="ls-row">
                 <span class="ls-label">Align</span> 
                 <div class="ls-grp">
-                    <button class="ls-b" onclick="adjL('al', 'left')"><i class="fas fa-align-left"></i></button>
-                    <button class="ls-b active" onclick="adjL('al', 'center')"><i class="fas fa-align-center"></i></button>
+                    <button class="ls-b active" onclick="adjL('al', 'left')"><i class="fas fa-align-left"></i></button>
+                    <button class="ls-b" onclick="adjL('al', 'center')"><i class="fas fa-align-center"></i></button>
                 </div>
             </div>
             <div class="ls-row">
@@ -553,39 +559,39 @@
                 <div id="rel-track" class="carousel-track"></div>
             </div>
         </div>
+        
+        <footer class="app-footer">
+            <h4 style="margin-top:0; color:white; font-size:18px;">Kirubai Payanam</h4>
+            <p style="font-size:13px; color:#b2bec3; max-width:600px; margin: 10px auto;">Sing unto the Lord a new song.</p>
+            <p style="font-size:12px; opacity:0.6; margin-top:20px;">&copy; 2025 Praise & Worship Team.</p>
+        </footer>
     </div>
 
     <!-- DATABASE -->
     <div id="db" style="display:none;">
-        <div class="s" data-t="ஆத்துமாவே நன்றி" data-tn="Aathmaave Nandri" data-s="Fr. Berchmans" data-c="Worship">ஆத்துமாவே நன்றி சொல்லு...</div>
-        <div class="s" data-t="உம்மை அல்லாமல்" data-tn="Ummai Allamal" data-s="Gersson" data-c="Worship">உம்மை அல்லாமல் எனக்கு...</div>
-        <div class="s" data-t="என்னப்பா அல்லவா" data-tn="Ennappa Allava" data-s="Traditional" data-c="Traditional">என்னப்பா அல்லவா...</div>
-        <div class="s" data-t="கிருபையினால்" data-tn="Kirubaiyinaal" data-s="Traditional" data-c="Traditional">கிருபையினால் நிலைநிற்கின்றோம்...</div>
-        <div class="s" data-t="ஆராதனை ஆராதனை" data-tn="Aaradhana" data-s="Worship" data-c="Worship">ஆராதனை ஆராதனை...</div>
-        <div class="s" data-t="ஆனந்தமாக அன்பரை" data-tn="Anandhamaga" data-s="Worship" data-c="Praise">ஆனந்தமாக அன்பரை...</div>
-        <div class="s" data-t="காவல் ஓபரே" data-tn="Kaaval Obarae" data-s="Traditional" data-c="Traditional">காவல் ஓபரே தருவேன்...</div>
-        <div class="s" data-t="இயேசு என்னும் நாமம்" data-tn="Yesu Ennum" data-s="Unknown" data-c="Praise">இயேசு என்னும் நாமம்...</div>
-        <div class="s" data-t="துதித்து பாடிட" data-tn="Thuthithu Paadida" data-s="Worship" data-c="Praise">துதித்து பாடிட பாத்திரம்...</div>
-        <div class="s" data-t="உயர் மலையோ" data-tn="Uyar Malaiyo" data-s="Comfort" data-c="Comfort">உயர் மலையோ ஆழ கடலோ...</div>
-        <div class="s" data-t="ஆட்கொண்ட தெய்வம்" data-tn="Aatkonnda Deivam" data-s="Comfort" data-c="Comfort">ஆட்கொண்ட தெய்வம்...</div>
-        <div class="s" data-t="ஆ! அம்பர உம்பர" data-tn="Aa Ambara" data-s="Christmas" data-c="Christmas">ஆ! அம்பர உம்பர...</div>
-        <!-- Duplicates for Carousel Demo -->
-        <div class="s" data-t="நீரே என் தஞ்சம்" data-tn="Neerae En Thanjam" data-s="Artist" data-c="Worship">நீரே என் தஞ்சம்...</div>
-        <div class="s" data-t="எல்லாம் இயேசுவே" data-tn="Ellam Yesuvae" data-s="Artist" data-c="Praise">எல்லாம் இயேசுவே...</div>
-        <div class="s" data-t="ஸ்தோத்திரம் இயேசுவே" data-tn="Sthothiram" data-s="Artist" data-c="Worship">ஸ்தோத்திரம் இயேசுவே...</div>
+        <div class="s" data-t="ஆத்துமாவே நன்றி" data-tn="Aathmaave Nandri" data-s="Fr. Berchmans" data-c="Worship">ஆத்துமாவே நன்றி சொல்லு\nமுழு உள்ளத்தோடே நன்றி சொல்லு\nகர்த்தர் செய்த நன்மைகளை\nஒரு நாளும் மறவாதே\n\nகுற்றங்களை எல்லாம் மன்னித்தாரே\nநோய்களை எல்லாம் குணமாக்கினாரே\nபரிசுத்தர் பரிசுத்தர் பரிசுத்தரே\nபரலோக ராஜாவே பரிசுத்தரே</div>
+        <div class="s" data-t="உம்மை அல்லாமல்" data-tn="Ummai Allamal" data-s="Gersson" data-c="Worship">உம்மை அல்லாமல் எனக்கு யார் உண்டு\nஉறவு என்று சொல்ல உரிமை என்று சொல்ல\nஉம்மை அல்லாமல் எனக்கு யார் உண்டு\n\nநீர் போதும் எனக்கு நீர் போதும் எனக்கு\nநீர் போதும் எனக்கு என் இயேசப்பா</div>
+        <div class="s" data-t="என்னப்பா அல்லவா" data-tn="Ennappa Allava" data-s="Traditional" data-c="Traditional">என்னப்பா அல்லவா - என் தாயும் அல்லவா\nபொன்னப்பா அல்லவா - என் தெய்வம் அல்லவா\n\nஎங்கு சென்றாலும் - அவர் என் பின் செல்வார்\nகண்கள் கண்டபடி - என்னை காக்க மாட்டார்</div>
+        <div class="s" data-t="கிருபையினால்" data-tn="Kirubaiyinaal" data-s="Traditional" data-c="Traditional">கிருபையினால் நிலைநிற்கின்றோம்\nகிருபையினால் நிற்கின்றோம்\n\nதேவ கிருபை... தேவ கிருபை...\nஅவர் கிருபை... அவர் கிருபை...</div>
+        <div class="s" data-t="ஆராதனை ஆராதனை" data-tn="Aaradhana" data-s="Worship" data-c="Worship">ஆராதனை ஆராதனை ஆராதனை\nஆண்டவர் ஆலயம் ஆராதனை நம்மை\nஅவருடன் இணைக்கும் அன்பின் கணை</div>
+        <div class="s" data-t="ஆனந்தமாக அன்பரை" data-tn="Anandhamaga" data-s="Worship" data-c="Praise">ஆனந்தமாக அன்பரைப் பாடுவேன்\nஆசையவரென் ஆத்துமாவிற்கே\n\nஇயேசுவல்லால் இயேசுவல்லால்\nஇன்பம் இகத்தில் வேறு எங்குமில்லையே</div>
+        <div class="s" data-t="காவல் ஓபரே" data-tn="Kaaval Obarae" data-s="Traditional" data-c="Traditional">காவல் ஓபரே தருவேன் ஸ்தோத்திரம்\nகாலமெல்லாம் காத்திட்ட காவல் ஓபரே\n\nதுன்ப நேரத்தில் இன்பம் ஆனவர்\nஇன்ப நேரத்தில் என்னை காத்தவர்</div>
+        <div class="s" data-t="இயேசு என்னும் நாமம்" data-tn="Yesu Ennum" data-s="Unknown" data-c="Praise">இயேசு என்னும் நாமம்\nஇனிமையான நாமம்\nஇன்பமான நாமம்\nஎங்கும் உள்ள நாமம்</div>
+        <div class="s" data-t="துதித்து பாடிட" data-tn="Thuthithu Paadida" data-s="Worship" data-c="Praise">துதித்து பாடிட பாத்திரம்\nஉம்மையே நம்புவோம் எப்போதும்\n\nஇயேசு போதும் இயேசு போதும்\nஎந்த நாளும் இயேசு போதும்</div>
+        <div class="s" data-t="உயர் மலையோ" data-tn="Uyar Malaiyo" data-s="Comfort" data-c="Comfort">உயர் மலையோ ஆழ கடலோ\nஎதுவும் என்னை பிரிப்பதில்லை\nஉம்மை விட்டு பிரிவதில்லை</div>
+        <div class="s" data-t="ஆட்கொண்ட தெய்வம்" data-tn="Aatkonnda Deivam" data-s="Comfort" data-c="Comfort">ஆட்கொண்ட தெய்வம் திருப்பாதம் அமர்ந்து\nஆறுதல் அடைகின்றேன்\nஅமைதி பெறுகின்றேன்</div>
+        <div class="s" data-t="ஆ! அம்பர உம்பர" data-tn="Aa Ambara" data-s="Christmas" data-c="Christmas">ஆ! அம்பர உம்பர மும் புகழுந்திரு\nஆதிபன் பிறந்தார்\nஆதிபன் பிறந்தார் – அமலாதிபன் பிறந்தார்</div>
     </div>
 
     <script>
         let songs = [];
-        let view = 'letter'; // Default View: LETTER
+        let view = 'letter';
         let cat = 'All';
         const grads = [ "linear-gradient(135deg, #6c5ce7, #a29bfe)", "linear-gradient(135deg, #00b894, #55efc4)", "linear-gradient(135deg, #e17055, #fab1a0)", "linear-gradient(135deg, #0984e3, #74b9ff)", "linear-gradient(135deg, #fd79a8, #e84393)" ];
 
         function init() {
             document.querySelectorAll('.s').forEach((el, i) => {
-                songs.push({
-                    id: i, t: el.dataset.t, tn: el.dataset.tn, s: el.dataset.s, c: el.dataset.c, l: el.innerHTML, bg: grads[i % grads.length]
-                });
+                songs.push({ id: i, t: el.dataset.t, tn: el.dataset.tn, s: el.dataset.s, c: el.dataset.c, l: el.innerHTML, bg: grads[i % grads.length] });
             });
             render();
         }
@@ -680,7 +686,7 @@
             document.getElementById('lv-singer').innerText = s.s;
             document.getElementById('lv-text').innerText = s.l;
             
-            // Carousel Related Songs
+            // Carousel Related Songs (Infinite Loop)
             const track = document.getElementById('rel-track'); track.innerHTML = '';
             // Clone list to make it seamless
             let rel = songs.filter(x => x.id !== id).concat(songs.filter(x => x.id !== id));
@@ -688,7 +694,7 @@
             rel.forEach(r => {
                 let rc = document.createElement('div'); rc.className = 'rel-card';
                 rc.onclick = () => { openL(r.id); document.getElementById('lyrics-view').scrollTop = 0; };
-                rc.innerHTML = `<div class="rel-cover" style="background:${r.bg}">${r.l.substring(0,30)}...</div>
+                rc.innerHTML = `<div class="rel-cover" style="background:${r.bg}">${r.l.substring(0,40)}...</div>
                 <div class="rel-info"><div class="rel-t">${r.t}</div><div class="rel-s">${r.s}</div></div>`;
                 track.appendChild(rc);
             });
@@ -709,7 +715,7 @@
             try { document.execCommand('copy'); alert('Copied!'); } catch(e){} document.body.removeChild(ta);
         }
 
-        /* --- BEAUTIFUL PPT GENERATION --- */
+        /* --- ADVANCED PPT LOGIC (Rich Design) --- */
         function dlPPT() {
             const t = document.getElementById('lv-title').innerText;
             const s = document.getElementById('lv-singer').innerText;
@@ -718,99 +724,96 @@
             let pptx = new PptxGenJS(); 
             pptx.layout = 'LAYOUT_16x9';
             
-            // Master Slide
+            // 1. Define Professional Master Slide (Gradient BG + Glass Card)
             pptx.defineSlideMaster({
-                title: "MASTER",
-                background: { color: "FFFFFF" },
+                title: "GLASS_THEME",
+                background: { fill: "F8F9FD" }, // Fallback
                 objects: [
-                    { rect: { x: 0, y: 0, w: "100%", h: 1.5, fill: { type: "gradient", color: ["6C5CE7", "a29bfe"] } } },
-                    { text: { text: "Kirubai Payanam", options: { x: 0.5, y: 0.4, w: 5, h: 0.5, color: "FFFFFF", fontSize: 20, bold:true, fontFace:'Arial' } } },
-                    { line: { x: 0, y: 7, w: "100%", h: 0, line: { color: "6C5CE7", width: 5 } } },
-                    { text: { text: "Generated by Kirubai Payanam App", options: { x: 0.5, y: 7.1, w: "90%", fontSize: 10, color: "888888" } } }
+                    // 1. Full Slide Gradient Background
+                    { 
+                        rect: { x: 0, y: 0, w: "100%", h: "100%", fill: { type: "gradient", color: ["6C5CE7", "a29bfe"], angle: 45 } } 
+                    },
+                    // 2. The "Glass" Card (White Rect with Transparency)
+                    { 
+                        rect: { 
+                            x: 0.5, y: 0.5, w: "9.0", h: "4.6", 
+                            fill: { color: "FFFFFF", transparency: 15 }, 
+                            r: 0.2, // Rounded corners
+                            line: { color: "FFFFFF", width: 1, transparency: 40 },
+                            shadow: { type: 'outer', color: '000000', blur: 10, offset: 5, opacity: 0.3 }
+                        } 
+                    },
+                    // 3. Footer Branding
+                    { 
+                        text: { 
+                            text: "Kirubai Payanam | Tamil Christian Lyrics", 
+                            options: { x: 0.5, y: 5.2, w: 9, h: 0.3, align: 'center', color: "FFFFFF", fontSize: 10, transparency: 20 } 
+                        } 
+                    }
                 ]
             });
 
-            // 1. Title Slide
-            let s1 = pptx.addSlide({masterName:"MASTER"});
-            s1.addText(t, { x:1, y:2.5, w:'80%', fontSize:60, align:'center', color:'2D3436', bold:true, fontFace:'Arial' });
-            s1.addText(s, { x:1, y:4.5, w:'80%', fontSize:32, align:'center', color:'636E72', italic:true });
+            // --- SLIDE 1: TITLE SLIDE ---
+            let s1 = pptx.addSlide({ masterName: "GLASS_THEME" });
+            
+            // Song Title (Big & Bold)
+            s1.addText(t, { 
+                x: 1, y: 1.5, w: '80%', h: 1.5, 
+                fontSize: 54, align: 'center', color: 'FFFFFF', bold: true, fontFace: 'Arial',
+                shadow: { type: 'outer', color: '000000', blur: 3, offset: 2, opacity: 0.3 }
+            });
+            
+            // Singer Name
+            s1.addText(s, { 
+                x: 1, y: 3.2, w: '80%', h: 0.5, 
+                fontSize: 28, align: 'center', color: 'F0F0F0', italic: true, fontFace: 'Arial' 
+            });
 
-            // 2. Lyrics Slides
-            let lines = l.split('\n').filter(x => x.trim());
-            for(let i=0; i<lines.length; i+=5) {
-                let slide = pptx.addSlide({masterName:"MASTER"});
-                
-                // Mini Header
-                slide.addText(t, { x:0.5, y:0.5, w:'85%', fontSize:14, color:'FFFFFF', bold:true, align:'right' });
-                
-                // Lyrics Content (Styled Box)
-                let txt = lines.slice(i, i+5).join('\n');
-                slide.addText(txt, { 
-                    x:1, y:2, w:'80%', h:'60%', 
-                    fontSize:40, align:'center', color:'333333', 
-                    valign:'middle', lineSpacing:48, fontFace:'Arial',
-                    shadow: {type:'outer', color:'cccccc', blur:3, offset:2}
-                });
+            // --- SLIDE 2+: LYRICS SLIDES ---
+            // Split by double newline (Stanza) or every 4 lines
+            let chunks = l.split(/\n\n+/); 
+            if (chunks.length < 2 || chunks[0].length > 300) {
+                let lines = l.split('\n').filter(x => x.trim());
+                chunks = [];
+                for(let i=0; i<lines.length; i+=4) {
+                    chunks.push(lines.slice(i, i+4).join('\n'));
+                }
             }
-            pptx.writeFile({fileName: t+".pptx"});
+
+            chunks.forEach(chunk => {
+                let slide = pptx.addSlide({ masterName: "GLASS_THEME" });
+                
+                // Small Header (Song Title)
+                slide.addText(t, { 
+                    x: 0.8, y: 0.7, w: '80%', h: 0.4, 
+                    fontSize: 14, color: 'E0E0E0', bold: true, align: 'left', fontFace: 'Arial' 
+                });
+                
+                // Lyrics Content (Centered in Glass Card)
+                slide.addText(chunk.trim(), { 
+                    x: 1, y: 1.2, w: '80%', h: '60%', 
+                    fontSize: 36, align: 'center', color: 'FFFFFF', 
+                    valign: 'middle', lineSpacing: 42, fontFace: 'Arial',
+                    shadow: { type: 'outer', color: '000000', blur: 2, offset: 1, opacity: 0.4 }
+                });
+            });
+            
+            pptx.writeFile({ fileName: t + ".pptx" });
         }
 
         function dlPDF() {
             const t = document.getElementById('lv-title').innerText;
-            const s = document.getElementById('lv-singer').innerText;
             const l = document.getElementById('lv-text').innerText;
-            
-            const element = document.createElement('div');
-            element.style.cssText = "padding: 40px; font-family: 'Helvetica', sans-serif; color: #333; text-align: center; border: 10px solid #6c5ce7; height: 100%; background: #fff;";
-            element.innerHTML = `
-                <h1 style="color:#6c5ce7; font-size:30px; margin-bottom:10px;">${t}</h1>
-                <div style="color:#666; font-style:italic; margin-bottom:40px;">${s}</div>
-                <div style="font-size:16px; line-height:2; white-space: pre-wrap;">${l}</div>
-                <div style="margin-top:50px; color:#ccc; font-size:12px;">Generated by Kirubai Payanam App</div>
-            `;
-            
-            var opt = {
-                margin: 0.5,
-                filename: t + '.pdf',
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2 },
-                jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
-            };
-            
-            html2pdf().set(opt).from(element).save();
+            const el = document.createElement('div');
+            el.innerHTML = `<div style="padding:40px; font-family:sans-serif; border:5px solid #6c5ce7;"><h1 style="color:#6c5ce7">${t}</h1><pre style="font-size:16px;">${l}</pre></div>`;
+            html2pdf().set({margin:0.5, filename:t+'.pdf'}).from(el).save();
         }
 
         function dlHTML() {
             const t = document.getElementById('lv-title').innerText;
-            const s = document.getElementById('lv-singer').innerText;
-            const l = document.getElementById('lv-text').innerText.replace(/\n/g, "<br>");
-            
-            const htmlContent = `
-            <html>
-            <head>
-                <title>${t}</title>
-                <style>
-                    body { font-family: 'Segoe UI', sans-serif; background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); margin: 0; padding: 40px; min-height: 100vh; display: flex; justify-content: center; align-items: center; }
-                    .card { background: white; padding: 50px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); max-width: 700px; width: 100%; text-align: center; }
-                    h1 { color: #6c5ce7; margin-bottom: 10px; }
-                    .singer { color: #888; font-style: italic; margin-bottom: 30px; }
-                    p { font-size: 18px; line-height: 2; color: #333; }
-                </style>
-            </head>
-            <body>
-                <div class="card">
-                    <h1>${t}</h1>
-                    <div class="singer">${s}</div>
-                    <p>${l}</p>
-                </div>
-            </body>
-            </html>`;
-            
-            const blob = new Blob([htmlContent], { type: "text/html" });
-            const link = document.createElement("a");
-            link.href = URL.createObjectURL(blob);
-            link.download = t + ".html";
-            link.click();
+            const l = document.getElementById('lv-text').innerText.replace(/\n/g, '<br>');
+            const b = new Blob([`<html><body style="font-family:sans-serif; padding:40px; background:#f0f0f0;"><div style="background:white; padding:40px; border-radius:10px;"><h1 style="color:#6c5ce7">${t}</h1><p>${l}</p></div></body></html>`], {type:'text/html'});
+            const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = t+".html"; a.click();
         }
 
         /* --- SETTINGS --- */
@@ -826,16 +829,9 @@
         function upCSS(v, val, id) { document.documentElement.style.setProperty(v, val); if(id) document.getElementById(id).innerText = val; }
         function setTheme(c, el) { document.documentElement.style.setProperty('--primary', c); document.querySelectorAll('.theme-circle').forEach(e=>e.classList.remove('active')); el.classList.add('active'); }
         function toggleDark(v) { if(v) document.body.setAttribute('data-theme', 'dark'); else document.body.removeAttribute('data-theme'); }
-        function setDensity(v, el) { 
-            // Mock function for demo
-            document.querySelectorAll('.ls-b').forEach(b => b.classList.remove('active')); el.classList.add('active');
-        }
-        function setGlobalFont(f, el) {
-            document.body.style.fontFamily = f + ', sans-serif';
-        }
-        function setBg(v, el) {
-            if(v==='simple') document.body.classList.add('simple-bg'); else document.body.classList.remove('simple-bg');
-        }
+        function setDensity(v, el) { document.querySelectorAll('.ls-b').forEach(b => b.classList.remove('active')); el.classList.add('active'); }
+        function setGlobalFont(f, el) { document.body.style.fontFamily = f + ', sans-serif'; }
+        function setBg(v, el) { if(v==='simple') document.body.classList.add('simple-bg'); else document.body.classList.remove('simple-bg'); }
 
         function toggleLS() {
             const p = document.getElementById('ls-panel'); const b = document.querySelector('.customize-btn');
