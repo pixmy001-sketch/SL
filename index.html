@@ -10,16 +10,14 @@
     <!-- Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- PDF & PPT Libraries -->
+    <!-- PDF Library Only -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.bundle.js"></script>
 
     <style>
         /* --- RESET & VARIABLES --- */
         * { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
         
         :root {
-            /* Theme Colors */
             --primary: #6c5ce7;
             --primary-light: #a29bfe;
             --bg: #f8f9fd;
@@ -35,7 +33,7 @@
             --cover-height: 180px;
             --shadow-opacity: 0.08;
             --title-size: 18px;
-            --anim-speed: 20s;
+            --anim-speed: 30s;
             --global-font: 'Poppins', sans-serif;
             --ui-padding: 20px;
             
@@ -80,7 +78,7 @@
 
         /* --- BACKGROUND ANIMATION --- */
         .bg-anim { position: fixed; top:0; left:0; width:100%; height:100%; z-index:-1; overflow:hidden; }
-        .blob { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.4; animation: float var(--anim-speed) infinite ease-in-out; }
+        .blob { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.4; animation: float 20s infinite ease-in-out; }
         .blob:nth-child(1) { width: 400px; height: 400px; background: var(--primary); top: -100px; left: -100px; opacity: 0.15; }
         .blob:nth-child(2) { width: 300px; height: 300px; background: #00b894; bottom: -50px; right: -50px; opacity: 0.15; animation-delay: -5s; }
         @keyframes float { 0%,100%{transform:translate(0,0);} 50%{transform:translate(30px,-30px);} }
@@ -88,81 +86,79 @@
         body.simple-bg { background: var(--bg); } 
         body.simple-bg .bg-anim { display: none; }
 
-        /* --- HEADER (Desktop) --- */
+        /* --- HEADER --- */
         header {
             background: var(--surface); 
-            padding: 20px 4%; 
+            padding: 15px 5%;
             position: sticky; top: 0; z-index: 100;
             box-shadow: var(--shadow);
             border-bottom: 1px solid var(--border);
             backdrop-filter: blur(12px);
-            margin-bottom: 20px;
+            transition: all 0.3s ease;
         }
 
-        .header-top { display: flex; justify-content: space-between; align-items: center; max-width: 1400px; margin: 0 auto; }
+        .header-main { display: flex; justify-content: space-between; align-items: center; max-width: 1600px; margin: 0 auto; position: relative; }
         
-        .logo { display: flex; align-items: center; gap: 12px; font-weight: 800; font-size: 24px; color: var(--primary); letter-spacing: -0.5px; }
-        .logo i { background: var(--primary); color: white; width: 40px; height: 40px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 18px; transform: rotate(-5deg); box-shadow: 0 4px 10px rgba(108, 92, 231, 0.4); }
+        .logo { display: flex; align-items: center; gap: 12px; font-weight: 800; font-size: 22px; color: var(--primary); letter-spacing: -0.5px; }
+        .logo i { background: var(--primary); color: white; width: 38px; height: 38px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 16px; transform: rotate(-5deg); box-shadow: 0 4px 10px rgba(108, 92, 231, 0.3); }
 
-        /* Desktop Nav */
-        .desktop-nav { display: none; gap: 5px; background: var(--bg); padding: 5px; border-radius: 25px; border: 1px solid var(--border); }
-        .v-btn { border: none; background: transparent; padding: 10px 18px; border-radius: 20px; cursor: pointer; color: var(--text-sub); transition: 0.2s; font-size: 14px; font-weight: 600; font-family: inherit; }
-        .v-btn:hover { color: var(--primary); background: rgba(0,0,0,0.02); }
-        .v-btn.active { background: var(--surface); color: var(--primary); box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        /* Header Actions (Right Side) */
+        .header-actions { display: flex; align-items: center; gap: 15px; }
+
+        /* Icon Only View Switcher */
+        .view-switch { display: flex; gap: 5px; background: rgba(0,0,0,0.03); padding: 4px; border-radius: 50px; border: 1px solid var(--border); }
+        .v-icon-btn { 
+            width: 36px; height: 36px; border-radius: 50%; border: none; background: transparent; 
+            cursor: pointer; color: var(--text-sub); display: flex; align-items: center; justify-content: center; transition: 0.2s; font-size: 16px;
+        }
+        .v-icon-btn:hover { color: var(--primary); background: rgba(255,255,255,0.5); }
+        .v-icon-btn.active { background: var(--surface); color: var(--primary); box-shadow: 0 2px 8px rgba(0,0,0,0.1); transform: scale(1.05); }
+
+        /* Search Toggle Button */
+        .search-toggle {
+            width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--border);
+            background: var(--surface); color: var(--text-main); cursor: pointer;
+            display: flex; align-items: center; justify-content: center; font-size: 18px; transition: 0.3s;
+        }
+        .search-toggle:hover, .search-toggle.active { background: var(--primary); color: white; border-color: var(--primary); }
+
+        /* Expandable Search Bar */
+        .search-overlay {
+            max-height: 0; overflow: hidden; transition: max-height 0.4s ease-out, opacity 0.3s;
+            opacity: 0; margin-top: 0;
+        }
+        .search-overlay.open { max-height: 80px; opacity: 1; margin-top: 15px; }
         
-        @media (min-width: 768px) { .desktop-nav { display: flex; } }
+        .search-input-wrap {
+            position: relative; max-width: 800px; margin: 0 auto;
+        }
+        .search-input-wrap input {
+            width: 100%; padding: 15px 50px 15px 25px; border-radius: 50px; border: 2px solid var(--primary);
+            background: var(--bg); color: var(--text-main); font-size: 16px; outline: none;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+        }
+        .search-close {
+            position: absolute; right: 20px; top: 50%; transform: translateY(-50%);
+            cursor: pointer; color: var(--text-sub);
+        }
 
-        /* Mobile Bottom Nav */
-        .mobile-nav {
-            display: flex; position: fixed; bottom: 0; left: 0; width: 100%;
-            background: var(--surface); border-top: 1px solid var(--border);
-            padding: 8px 15px; 
-            justify-content: space-around; z-index: 1000;
-            box-shadow: 0 -5px 20px rgba(0,0,0,0.05);
-            backdrop-filter: blur(10px);
-            height: 60px;
-        }
-        @media (min-width: 768px) { .mobile-nav { display: none; } body { padding-bottom: 0; } }
-        
-        .m-nav-item {
-            display: flex; flex-direction: column; align-items: center; gap: 3px;
-            color: var(--text-sub); font-size: 10px; font-weight: 600; cursor: pointer;
-            width: 60px; transition: 0.2s; justify-content: center;
-        }
-        .m-nav-item i { font-size: 20px; }
-        .m-nav-item.active { color: var(--primary); transform: translateY(-2px); }
-
-        /* Search Row */
-        .search-row { 
-            max-width: 1400px; margin: 20px auto 0; display: flex; gap: 15px; align-items: center; 
-        }
-        .search-box {
-            flex-grow: 1; display: flex; align-items: center; background: var(--bg);
-            padding: 0 25px; border-radius: 35px; border: 1px solid var(--border);
-            transition: 0.3s; box-shadow: inset 0 2px 5px rgba(0,0,0,0.02); height: 55px;
-        }
-        .search-box:focus-within { border-color: var(--primary); background: var(--surface); box-shadow: 0 6px 20px rgba(108, 92, 231, 0.15); }
-        .search-box input {
-            border: none; background: transparent; padding: 15px 10px; width: 100%;
-            font-size: 16px; color: var(--text-main); font-family: inherit; height: 100%;
-        }
+        /* Settings Button */
         .settings-btn {
-            width: 55px; height: 55px; border-radius: 50%; background: var(--surface);
-            border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; 
-            cursor: pointer; color: var(--text-main); transition: 0.2s; flex-shrink: 0; font-size: 22px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            width: 40px; height: 40px; border-radius: 50%; background: transparent;
+            border: none; display: flex; align-items: center; justify-content: center; 
+            cursor: pointer; color: var(--text-sub); transition: 0.2s; font-size: 20px;
         }
-        .settings-btn:hover { background: var(--primary); color: white; border-color: var(--primary); transform: rotate(90deg); }
+        .settings-btn:hover { color: var(--primary); transform: rotate(90deg); }
 
         /* Categories */
         .cat-bar {
-            display: flex; gap: 12px; overflow-x: auto; padding: 20px 0 5px;
-            max-width: 1400px; margin: 0 auto; scrollbar-width: none;
+            display: flex; gap: 12px; overflow-x: auto; padding: 15px 0 5px;
+            max-width: 1600px; margin: 0 auto; scrollbar-width: none;
         }
         .cat-chip {
-            padding: 10px 24px; border-radius: 30px; background: var(--surface);
+            padding: 8px 20px; border-radius: 30px; background: var(--surface);
             border: 1px solid var(--border); color: var(--text-sub); cursor: pointer;
-            font-size: 14px; white-space: nowrap; font-weight: 600; transition: 0.2s;
+            font-size: 13px; white-space: nowrap; font-weight: 600; transition: 0.2s;
             box-shadow: 0 2px 5px rgba(0,0,0,0.02);
         }
         .cat-chip:hover { border-color: var(--primary); color: var(--primary); transform: translateY(-2px); }
@@ -171,7 +167,7 @@
         /* --- SETTINGS MODAL --- */
         #settings-modal {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.6); z-index: 2000; align-items: center; justify-content: center;
+            background: rgba(0,0,0,0.6); z-index: 3000; align-items: center; justify-content: center;
             backdrop-filter: blur(8px);
         }
         .settings-box {
@@ -183,7 +179,7 @@
         @keyframes popUp { from{transform:scale(0.9) translateY(20px); opacity:0;} to{transform:scale(1) translateY(0); opacity:1;} }
 
         .s-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; border-bottom: 2px solid var(--border); padding-bottom: 15px; }
-        .s-title { font-size: 22px; font-weight: 800; color: var(--primary); }
+        .s-title { font-size: 20px; font-weight: 800; color: var(--primary); }
         
         .s-section-title { 
             font-size: 12px; font-weight: 800; color: var(--text-sub); text-transform: uppercase; 
@@ -194,7 +190,7 @@
         .s-item { margin-bottom: 22px; }
         .s-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
         .s-label { font-size: 15px; font-weight: 600; display:flex; align-items:center; gap:8px; }
-        .s-val { font-size: 13px; color: var(--primary); font-weight: 700; background: rgba(108, 92, 231, 0.1); padding: 3px 10px; border-radius: 8px; }
+        .s-val { font-size: 13px; color: var(--primary); font-weight: 700; background: rgba(108, 92, 231, 0.1); padding: 3px 10px; border-radius: 6px; }
         
         input[type=range] { width: 100%; accent-color: var(--primary); height: 8px; background: #ddd; border-radius: 5px; -webkit-appearance: none; }
         input[type=range]::-webkit-slider-thumb { 
@@ -224,13 +220,17 @@
         }
         .reset-btn:hover { background: var(--primary); color: white; border-style: solid; }
 
-        .view-settings { display: none; animation: fadeIn 0.3s; }
-        .view-settings.active { display: block; }
-        @keyframes fadeIn { from{opacity:0;} to{opacity:1;} }
+        .view-specific-settings { display: none; }
+        .view-specific-settings.active { display: block; }
+        
+        .ls-grp { display: flex; gap: 5px; background: rgba(0,0,0,0.05); padding: 4px; border-radius: 12px; width: 100%; }
+        .ls-b { flex: 1; padding: 8px; border: none; background: transparent; cursor: pointer; color: inherit; border-radius: 8px; font-size: 14px; font-weight: 600; transition: 0.2s; }
+        .ls-b:hover { background: rgba(0,0,0,0.05); }
+        .ls-b.active { background: var(--surface); color: var(--primary); box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
 
         /* --- CONTENT VIEWS --- */
-        #main-container { flex: 1; padding: 20px 4%; max-width: 1400px; margin: 0 auto; width: 100%; }
-
+        #container { flex: 1; padding: 20px 5%; width: 100%; max-width: 100%; box-sizing: border-box; }
+        
         /* 1. LETTER VIEW (Default) */
         .letter-group { margin-bottom: 35px; }
         .letter-head { 
@@ -308,7 +308,7 @@
         @keyframes slideIn { from{transform:translateY(100%);} to{transform:translateY(0);} }
 
         .lv-header {
-            position: sticky; top: 0; background: var(--l-bg); padding: 15px 4%;
+            position: sticky; top: 0; background: var(--l-bg); padding: 15px 5%;
             display: flex; align-items: center; justify-content: space-between;
             border-bottom: 1px solid rgba(0,0,0,0.05); z-index: 10;
             transition: background 0.3s;
@@ -335,15 +335,15 @@
         .dl-chip::after { content:''; position:absolute; top:0; left:-100%; width:100%; height:100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent); transition:0.5s; }
         .dl-chip:hover::after { left:100%; }
         
-        .ppt-c { background: linear-gradient(135deg, #e67e22, #f39c12); }
         .pdf-c { background: linear-gradient(135deg, #e74c3c, #c0392b); }
         .html-c { background: linear-gradient(135deg, #3498db, #2980b9); }
 
         .lv-content {
-            padding: 50px 25px; max-width: 900px; margin: 0 auto;
+            padding: 50px 5%; max-width: 1200px; margin: 0 auto; width: 100%;
             font-family: var(--l-font); font-size: var(--l-size); line-height: var(--l-height);
             text-align: var(--l-align); white-space: pre-wrap; transition: all 0.3s;
             letter-spacing: var(--l-spacing); text-transform: var(--l-transform);
+            min-height: 50vh;
         }
 
         /* Improved Lyrics Settings Popup (Glassmorphism) */
@@ -358,36 +358,71 @@
         
         .ls-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
         .ls-label { font-size: 11px; font-weight: 800; color: var(--text-sub); text-transform: uppercase; letter-spacing: 0.5px; }
-        .ls-grp { display: flex; gap: 5px; background: rgba(0,0,0,0.05); padding: 4px; border-radius: 12px; width: 100%; }
-        .ls-b { flex: 1; padding: 8px; border: none; background: transparent; cursor: pointer; color: inherit; border-radius: 8px; font-size: 14px; font-weight: 600; transition: 0.2s; }
-        .ls-b:hover { background: rgba(0,0,0,0.05); }
-        .ls-b.active { background: var(--primary); color: white; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+        
+        .ls-color-dot { width: 24px; height: 24px; border-radius: 50%; border: 1px solid rgba(0,0,0,0.2); cursor: pointer; }
+        .ls-color-dot.active { transform: scale(1.2); border: 2px solid var(--primary); }
 
         /* Carousel Related Songs */
         .rel-sec { background: rgba(0,0,0,0.03); padding: 60px 5%; border-top: 1px solid var(--border); }
-        .rel-title { font-size: 20px; font-weight: 800; color: var(--primary); margin-bottom: 25px; border-left: 6px solid var(--primary); padding-left: 20px; }
+        .rel-title-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 25px; }
+        .rel-title { font-size: 20px; font-weight: 800; color: var(--primary); border-left: 6px solid var(--primary); padding-left: 20px; }
         
+        .carousel-controls { display: flex; gap: 10px; }
+        .c-btn { 
+            width: 35px; height: 35px; border-radius: 50%; border: 1px solid var(--border); 
+            background: var(--surface); color: var(--text-sub); cursor: pointer; display: flex; 
+            align-items: center; justify-content: center; transition: 0.2s;
+        }
+        .c-btn:hover { background: var(--primary); color: white; border-color: var(--primary); }
+        .c-btn.active { background: var(--primary); color: white; }
+
         .carousel-wrap { overflow: hidden; width: 100%; position: relative; padding: 10px 0; }
-        .carousel-track { display: flex; gap: 20px; animation: scrollLeft 40s linear infinite; width: max-content; }
+        .carousel-track { display: flex; gap: 20px; animation: scrollLeft var(--anim-speed) linear infinite; width: max-content; }
         .carousel-track:hover { animation-play-state: paused; }
+        .carousel-track.paused { animation-play-state: paused; }
+        
         @keyframes scrollLeft { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
         
         .rel-card {
-            min-width: 250px; width: 250px; background: var(--card-bg); 
+            min-width: 280px; width: 280px; background: var(--card-bg); 
             border-radius: 20px; overflow: hidden; box-shadow: 0 10px 20px rgba(0,0,0,0.05);
             cursor: pointer; transition: 0.3s; border: 1px solid var(--border);
             display: flex; flex-direction: column;
         }
         .rel-card:hover { transform: translateY(-8px) scale(1.02); box-shadow: 0 15px 35px rgba(0,0,0,0.15); border-color: var(--primary); }
-        .rel-cover { height: 130px; display: flex; align-items: center; justify-content: center; color: white; font-size: 11px; text-align: center; padding: 15px; background-size: 200%; animation: grad 8s infinite; }
-        .rel-info { padding: 15px; }
-        .rel-t { font-size: 15px; font-weight: 700; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--text-main); }
+        .rel-cover { height: 160px; display: flex; align-items: center; justify-content: center; color: white; font-size: 13px; text-align: center; padding: 15px; background-size: 200%; animation: grad 8s infinite; }
+        .rel-info { padding: 18px; }
+        .rel-t { font-size: 16px; font-weight: 700; margin-bottom: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--text-main); }
         .rel-s { font-size: 12px; color: var(--text-sub); }
+        /* Gradient fade for carousel */
+        .carousel-wrap::before, .carousel-wrap::after { content: ""; position: absolute; top: 0; width: 60px; height: 100%; z-index: 2; pointer-events: none; }
+        .carousel-wrap::before { left: 0; background: linear-gradient(to right, var(--bg), transparent); }
+        .carousel-wrap::after { right: 0; background: linear-gradient(to left, var(--bg), transparent); }
 
-        /* Footer */
-        .app-footer { background: #2d3436; color: #dfe6e9; padding: 50px 20px; text-align: center; margin-top: auto; }
-        .f-social a { color: var(--primary); font-size: 24px; margin: 0 15px; text-decoration: none; transition: 0.2s; }
-        .f-social a:hover { color: white; transform: scale(1.2); display: inline-block; }
+        /* Footer (Enhanced) */
+        .app-footer { 
+            background: #2d3436; color: #dfe6e9; padding: 60px 5% 30px; 
+            margin-top: auto; position: relative; overflow: hidden; font-size: 14px;
+        }
+        .f-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 40px; text-align: left; max-width: 1400px; margin: 0 auto; }
+        
+        .f-col h4 { color: white; margin-bottom: 20px; font-size: 18px; position: relative; display: inline-block; }
+        .f-col h4::after { content: ''; display: block; width: 40px; height: 3px; background: var(--primary); margin-top: 8px; border-radius: 2px; }
+        .f-col p { line-height: 1.6; opacity: 0.8; margin-bottom: 20px; }
+        
+        .f-links { list-style: none; padding: 0; }
+        .f-links li { margin-bottom: 12px; }
+        .f-links a { color: #b2bec3; text-decoration: none; transition: 0.2s; display: flex; align-items: center; gap: 8px; }
+        .f-links a:hover { color: var(--primary-light); padding-left: 5px; }
+        
+        .f-social { display: flex; gap: 15px; margin-top: 10px; }
+        .f-social a { 
+            width: 40px; height: 40px; background: rgba(255,255,255,0.1); border-radius: 50%; 
+            display: flex; align-items: center; justify-content: center; color: white; text-decoration: none; transition: 0.3s; 
+        }
+        .f-social a:hover { background: var(--primary); transform: translateY(-3px); }
+
+        .f-bottom { border-top: 1px solid rgba(255,255,255,0.1); margin-top: 50px; padding-top: 20px; text-align: center; font-size: 12px; opacity: 0.6; }
 
     </style>
 </head>
@@ -396,22 +431,32 @@
     <div class="bg-anim"><div class="blob"></div><div class="blob"></div></div>
 
     <header>
-        <div class="header-top">
+        <div class="header-main">
             <div class="logo"><i class="fas fa-music"></i> Kirubai Payanam</div>
             
-            <div class="desktop-nav">
-                <button class="v-btn active" id="btn-letter" onclick="setView('letter')"><i class="fas fa-font"></i> A-Z</button>
-                <button class="v-btn" id="btn-grid" onclick="setView('grid')"><i class="fas fa-th-large"></i> Grid</button>
-                <button class="v-btn" id="btn-list" onclick="setView('list')"><i class="fas fa-list"></i> List</button>
+            <div class="header-actions">
+                <!-- Search Toggle -->
+                <button class="search-toggle" onclick="toggleSearch()" title="Search">
+                    <i class="fas fa-search"></i>
+                </button>
+                
+                <!-- View Switcher (Icons Only) -->
+                <div class="desktop-nav">
+                    <button class="v-icon-btn active" id="btn-letter" onclick="setView('letter')" title="A-Z Index"><i class="fas fa-font"></i></button>
+                    <button class="v-icon-btn" id="btn-grid" onclick="setView('grid')" title="Grid View"><i class="fas fa-th-large"></i></button>
+                    <button class="v-icon-btn" id="btn-list" onclick="setView('list')" title="List View"><i class="fas fa-list"></i></button>
+                </div>
+
+                <button class="settings-btn" onclick="openSettings()"><i class="fas fa-cog"></i></button>
             </div>
         </div>
         
-        <div class="search-row">
-            <div class="search-box">
-                <i class="fas fa-search" style="color:#aaa;"></i>
-                <input type="text" id="inp-search" placeholder="Search lyrics (e.g. Aatma)..." onkeyup="filterSongs()">
+        <!-- Expandable Search -->
+        <div id="search-overlay" class="search-overlay">
+            <div class="search-input-wrap">
+                <input type="text" id="inp-search" placeholder="Search song lyrics, artist or category..." onkeyup="filterSongs()">
+                <i class="fas fa-times search-close" onclick="toggleSearch()"></i>
             </div>
-            <button class="settings-btn" onclick="openSettings()"><i class="fas fa-sliders-h"></i></button>
         </div>
 
         <div class="cat-bar">
@@ -426,15 +471,37 @@
 
     <div id="container"></div>
 
+    <!-- Main Footer -->
     <footer class="app-footer">
-        <h4 style="margin-top:0; color:white; font-size:18px;">Kirubai Payanam</h4>
-        <p style="font-size:13px; color:#b2bec3; max-width:600px; margin: 10px auto;">Sing unto the Lord a new song, for He has done marvelous things.</p>
-        <div class="f-social">
-            <a href="#"><i class="fab fa-youtube"></i></a>
-            <a href="#"><i class="fab fa-facebook"></i></a>
-            <a href="#"><i class="fab fa-instagram"></i></a>
+        <div class="f-grid">
+            <div class="f-col">
+                <h4>Kirubai Payanam</h4>
+                <p>Sing unto the Lord a new song, for He has done marvelous things. Your ultimate destination for Tamil Christian lyrics.</p>
+                <div class="f-social">
+                    <a href="#"><i class="fab fa-youtube"></i></a>
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                </div>
+            </div>
+            <div class="f-col">
+                <h4>Explore</h4>
+                <ul class="f-links">
+                    <li><a href="#" onclick="setView('letter')"><i class="fas fa-chevron-right" style="font-size:10px;"></i> A-Z Index</a></li>
+                    <li><a href="#" onclick="setView('grid')"><i class="fas fa-chevron-right" style="font-size:10px;"></i> Browse Cards</a></li>
+                    <li><a href="#" onclick="openSettings()"><i class="fas fa-chevron-right" style="font-size:10px;"></i> Appearance</a></li>
+                </ul>
+            </div>
+            <div class="f-col">
+                <h4>Contact</h4>
+                <ul class="f-links">
+                    <li><a href="#"><i class="fas fa-envelope"></i> support@kirubaipayanam.com</a></li>
+                    <li><a href="#"><i class="fas fa-globe"></i> www.kirubaipayanam.com</a></li>
+                </ul>
+            </div>
         </div>
-        <p style="font-size:12px; opacity:0.6; margin-top:30px;">&copy; 2025 Praise & Worship Team.</p>
+        <div class="f-bottom">
+            &copy; 2025 Praise & Worship Team. Made with <i class="fas fa-heart" style="color:#ff7675;"></i> for His Glory.
+        </div>
     </footer>
 
     <!-- Mobile Bottom Navigation -->
@@ -442,7 +509,7 @@
         <div class="m-nav-item active" onclick="setView('letter'); updateMobileNav(this)"><i class="fas fa-font"></i> A-Z</div>
         <div class="m-nav-item" onclick="setView('grid'); updateMobileNav(this)"><i class="fas fa-th-large"></i> Grid</div>
         <div class="m-nav-item" onclick="setView('list'); updateMobileNav(this)"><i class="fas fa-list"></i> List</div>
-        <div class="m-nav-item" onclick="openSettings()"><i class="fas fa-cog"></i> Settings</div>
+        <div class="m-nav-item" onclick="toggleSearch()"><i class="fas fa-search"></i> Search</div>
     </div>
 
     <!-- APP SETTINGS MODAL -->
@@ -472,6 +539,13 @@
 
             <div class="s-section-title"><i class="fas fa-eye"></i> Appearance</div>
             <div class="s-item">
+                <div class="s-row"><span class="s-label">UI Density</span></div>
+                <div class="ls-grp">
+                    <button class="ls-b active" onclick="setDensity('comfortable', this)">Comfortable</button>
+                    <button class="ls-b" onclick="setDensity('compact', this)">Compact</button>
+                </div>
+            </div>
+            <div class="s-item">
                 <div class="s-row"><span class="s-label">Font Style</span></div>
                 <div class="ls-grp">
                     <button class="ls-b active" onclick="setGlobalFont('Poppins', this)">Poppins</button>
@@ -491,6 +565,9 @@
             </div>
             <div class="s-item">
                 <div class="s-row"><span class="s-label">Dark Mode</span><div class="toggle"><input type="checkbox" onchange="toggleDark(this.checked)"><span class="slider"></span></div></div>
+            </div>
+            <div class="s-item">
+                <div class="s-row"><span class="s-label">Background Animation</span><div class="toggle"><input type="checkbox" checked onchange="toggleAnim(!this.checked)"><span class="slider"></span></div></div>
             </div>
             
             <button class="reset-btn" onclick="location.reload()"><i class="fas fa-undo"></i> Reset All Settings</button>
@@ -512,7 +589,6 @@
         </div>
 
         <div class="dl-container">
-            <button class="dl-chip ppt-c" onclick="dlPPT()"><i class="fas fa-file-powerpoint"></i> PPT</button>
             <button class="dl-chip pdf-c" onclick="dlPDF()"><i class="fas fa-file-pdf"></i> PDF</button>
             <button class="dl-chip html-c" onclick="dlHTML()"><i class="fas fa-code"></i> HTML</button>
         </div>
@@ -554,33 +630,52 @@
         <div id="lv-text" class="lv-content"></div>
 
         <div class="rel-sec">
-            <div class="rel-title">You Might Also Like</div>
+            <div class="rel-title-row">
+                <div class="rel-title">You Might Also Like</div>
+                <div class="carousel-controls">
+                    <button class="c-btn" onclick="toggleCarousel()" id="c-toggle"><i class="fas fa-pause"></i></button>
+                </div>
+            </div>
             <div class="carousel-wrap">
                 <div id="rel-track" class="carousel-track"></div>
             </div>
         </div>
         
+        <!-- Lyrics Page Footer -->
         <footer class="app-footer">
-            <h4 style="margin-top:0; color:white; font-size:18px;">Kirubai Payanam</h4>
-            <p style="font-size:13px; color:#b2bec3; max-width:600px; margin: 10px auto;">Sing unto the Lord a new song.</p>
-            <p style="font-size:12px; opacity:0.6; margin-top:20px;">&copy; 2025 Praise & Worship Team.</p>
+            <div class="f-grid">
+                <div class="f-col">
+                    <h4>Kirubai Payanam</h4>
+                    <p>Connecting hearts through Tamil Christian lyrics. Worship without limits.</p>
+                </div>
+                <div class="f-col">
+                    <h4>Share</h4>
+                    <div class="f-social">
+                        <a href="#"><i class="fab fa-whatsapp"></i></a>
+                        <a href="#"><i class="fab fa-telegram"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="f-bottom">
+                &copy; 2025 Praise & Worship Team.
+            </div>
         </footer>
     </div>
 
     <!-- DATABASE -->
     <div id="db" style="display:none;">
-        <div class="s" data-t="ஆத்துமாவே நன்றி" data-tn="Aathmaave Nandri" data-s="Fr. Berchmans" data-c="Worship">ஆத்துமாவே நன்றி சொல்லு\nமுழு உள்ளத்தோடே நன்றி சொல்லு\nகர்த்தர் செய்த நன்மைகளை\nஒரு நாளும் மறவாதே\n\nகுற்றங்களை எல்லாம் மன்னித்தாரே\nநோய்களை எல்லாம் குணமாக்கினாரே\nபரிசுத்தர் பரிசுத்தர் பரிசுத்தரே\nபரலோக ராஜாவே பரிசுத்தரே</div>
-        <div class="s" data-t="உம்மை அல்லாமல்" data-tn="Ummai Allamal" data-s="Gersson" data-c="Worship">உம்மை அல்லாமல் எனக்கு யார் உண்டு\nஉறவு என்று சொல்ல உரிமை என்று சொல்ல\nஉம்மை அல்லாமல் எனக்கு யார் உண்டு\n\nநீர் போதும் எனக்கு நீர் போதும் எனக்கு\nநீர் போதும் எனக்கு என் இயேசப்பா</div>
-        <div class="s" data-t="என்னப்பா அல்லவா" data-tn="Ennappa Allava" data-s="Traditional" data-c="Traditional">என்னப்பா அல்லவா - என் தாயும் அல்லவா\nபொன்னப்பா அல்லவா - என் தெய்வம் அல்லவா\n\nஎங்கு சென்றாலும் - அவர் என் பின் செல்வார்\nகண்கள் கண்டபடி - என்னை காக்க மாட்டார்</div>
-        <div class="s" data-t="கிருபையினால்" data-tn="Kirubaiyinaal" data-s="Traditional" data-c="Traditional">கிருபையினால் நிலைநிற்கின்றோம்\nகிருபையினால் நிற்கின்றோம்\n\nதேவ கிருபை... தேவ கிருபை...\nஅவர் கிருபை... அவர் கிருபை...</div>
-        <div class="s" data-t="ஆராதனை ஆராதனை" data-tn="Aaradhana" data-s="Worship" data-c="Worship">ஆராதனை ஆராதனை ஆராதனை\nஆண்டவர் ஆலயம் ஆராதனை நம்மை\nஅவருடன் இணைக்கும் அன்பின் கணை</div>
-        <div class="s" data-t="ஆனந்தமாக அன்பரை" data-tn="Anandhamaga" data-s="Worship" data-c="Praise">ஆனந்தமாக அன்பரைப் பாடுவேன்\nஆசையவரென் ஆத்துமாவிற்கே\n\nஇயேசுவல்லால் இயேசுவல்லால்\nஇன்பம் இகத்தில் வேறு எங்குமில்லையே</div>
-        <div class="s" data-t="காவல் ஓபரே" data-tn="Kaaval Obarae" data-s="Traditional" data-c="Traditional">காவல் ஓபரே தருவேன் ஸ்தோத்திரம்\nகாலமெல்லாம் காத்திட்ட காவல் ஓபரே\n\nதுன்ப நேரத்தில் இன்பம் ஆனவர்\nஇன்ப நேரத்தில் என்னை காத்தவர்</div>
-        <div class="s" data-t="இயேசு என்னும் நாமம்" data-tn="Yesu Ennum" data-s="Unknown" data-c="Praise">இயேசு என்னும் நாமம்\nஇனிமையான நாமம்\nஇன்பமான நாமம்\nஎங்கும் உள்ள நாமம்</div>
-        <div class="s" data-t="துதித்து பாடிட" data-tn="Thuthithu Paadida" data-s="Worship" data-c="Praise">துதித்து பாடிட பாத்திரம்\nஉம்மையே நம்புவோம் எப்போதும்\n\nஇயேசு போதும் இயேசு போதும்\nஎந்த நாளும் இயேசு போதும்</div>
-        <div class="s" data-t="உயர் மலையோ" data-tn="Uyar Malaiyo" data-s="Comfort" data-c="Comfort">உயர் மலையோ ஆழ கடலோ\nஎதுவும் என்னை பிரிப்பதில்லை\nஉம்மை விட்டு பிரிவதில்லை</div>
-        <div class="s" data-t="ஆட்கொண்ட தெய்வம்" data-tn="Aatkonnda Deivam" data-s="Comfort" data-c="Comfort">ஆட்கொண்ட தெய்வம் திருப்பாதம் அமர்ந்து\nஆறுதல் அடைகின்றேன்\nஅமைதி பெறுகின்றேன்</div>
-        <div class="s" data-t="ஆ! அம்பர உம்பர" data-tn="Aa Ambara" data-s="Christmas" data-c="Christmas">ஆ! அம்பர உம்பர மும் புகழுந்திரு\nஆதிபன் பிறந்தார்\nஆதிபன் பிறந்தார் – அமலாதிபன் பிறந்தார்</div>
+        <div class="s" data-t="ஆத்துமாவே நன்றி" data-tn="Aathmaave Nandri" data-s="Fr. Berchmans" data-c="Worship">ஆத்துமாவே நன்றி சொல்லு<br>முழு உள்ளத்தோடே நன்றி சொல்லு<br>கர்த்தர் செய்த நன்மைகளை<br>ஒரு நாளும் மறவாதே<br><br>குற்றங்களை எல்லாம் மன்னித்தாரே<br>நோய்களை எல்லாம் குணமாக்கினாரே<br>பரிசுத்தர் பரிசுத்தர் பரிசுத்தரே<br>பரலோக ராஜாவே பரிசுத்தரே</div>
+        <div class="s" data-t="உம்மை அல்லாமல்" data-tn="Ummai Allamal" data-s="Gersson" data-c="Worship">உம்மை அல்லாமல் எனக்கு யார் உண்டு<br>உறவு என்று சொல்ல உரிமை என்று சொல்ல<br>உம்மை அல்லாமல் எனக்கு யார் உண்டு<br><br>நீர் போதும் எனக்கு நீர் போதும் எனக்கு<br>நீர் போதும் எனக்கு என் இயேசப்பா</div>
+        <div class="s" data-t="என்னப்பா அல்லவா" data-tn="Ennappa Allava" data-s="Traditional" data-c="Traditional">என்னப்பா அல்லவா - என் தாயும் அல்லவா<br>பொன்னப்பா அல்லவா - என் தெய்வம் அல்லவா<br><br>எங்கு சென்றாலும் - அவர் என் பின் செல்வார்<br>கண்கள் கண்டபடி - என்னை காக்க மாட்டார்</div>
+        <div class="s" data-t="கிருபையினால்" data-tn="Kirubaiyinaal" data-s="Traditional" data-c="Traditional">கிருபையினால் நிலைநிற்கின்றோம்<br>கிருபையினால் நிற்கின்றோம்<br><br>தேவ கிருபை... தேவ கிருபை...<br>அவர் கிருபை... அவர் கிருபை...</div>
+        <div class="s" data-t="ஆராதனை ஆராதனை" data-tn="Aaradhana" data-s="Worship" data-c="Worship">ஆராதனை ஆராதனை ஆராதனை<br>ஆண்டவர் ஆலயம் ஆராதனை நம்மை<br>அவருடன் இணைக்கும் அன்பின் கணை</div>
+        <div class="s" data-t="ஆனந்தமாக அன்பரை" data-tn="Anandhamaga" data-s="Worship" data-c="Praise">ஆனந்தமாக அன்பரைப் பாடுவேன்<br>ஆசையவரென் ஆத்துமாவிற்கே<br><br>இயேசுவல்லால் இயேசுவல்லால்<br>இன்பம் இகத்தில் வேறு எங்குமில்லையே</div>
+        <div class="s" data-t="காவல் ஓபரே" data-tn="Kaaval Obarae" data-s="Traditional" data-c="Traditional">காவல் ஓபரே தருவேன் ஸ்தோத்திரம்<br>காலமெல்லாம் காத்திட்ட காவல் ஓபரே<br><br>துன்ப நேரத்தில் இன்பம் ஆனவர்<br>இன்ப நேரத்தில் என்னை காத்தவர்</div>
+        <div class="s" data-t="இயேசு என்னும் நாமம்" data-tn="Yesu Ennum" data-s="Unknown" data-c="Praise">இயேசு என்னும் நாமம்<br>இனிமையான நாமம்<br>இன்பமான நாமம்<br>எங்கும் உள்ள நாமம்</div>
+        <div class="s" data-t="துதித்து பாடிட" data-tn="Thuthithu Paadida" data-s="Worship" data-c="Praise">துதித்து பாடிட பாத்திரம்<br>உம்மையே நம்புவோம் எப்போதும்<br><br>இயேசு போதும் இயேசு போதும்<br>எந்த நாளும் இயேசு போதும்</div>
+        <div class="s" data-t="உயர் மலையோ" data-tn="Uyar Malaiyo" data-s="Comfort" data-c="Comfort">உயர் மலையோ ஆழ கடலோ<br>எதுவும் என்னை பிரிப்பதில்லை<br>உம்மை விட்டு பிரிவதில்லை</div>
+        <div class="s" data-t="ஆட்கொண்ட தெய்வம்" data-tn="Aatkonnda Deivam" data-s="Comfort" data-c="Comfort">ஆட்கொண்ட தெய்வம் திருப்பாதம் அமர்ந்து<br>ஆறுதல் அடைகின்றேன்<br>அமைதி பெறுகின்றேன்</div>
+        <div class="s" data-t="ஆ! அம்பர உம்பர" data-tn="Aa Ambara" data-s="Christmas" data-c="Christmas">ஆ! அம்பர உம்பர மும் புகழுந்திரு<br>ஆதிபன் பிறந்தார்<br>ஆதிபன் பிறந்தார் – அமலாதிபன் பிறந்தார்</div>
     </div>
 
     <script>
@@ -591,14 +686,20 @@
 
         function init() {
             document.querySelectorAll('.s').forEach((el, i) => {
-                songs.push({ id: i, t: el.dataset.t, tn: el.dataset.tn, s: el.dataset.s, c: el.dataset.c, l: el.innerHTML, bg: grads[i % grads.length] });
+                // Use innerHTML to preserve <br> tags
+                let content = el.innerHTML;
+                songs.push({
+                    id: i, t: el.dataset.t, tn: el.dataset.tn, s: el.dataset.s, c: el.dataset.c, 
+                    l: content, // Keep HTML breaks
+                    bg: grads[i % grads.length]
+                });
             });
             render();
         }
 
         function setView(v) {
             view = v;
-            document.querySelectorAll('.v-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.v-icon-btn').forEach(b => b.classList.remove('active'));
             if(document.getElementById('btn-'+v)) document.getElementById('btn-'+v).classList.add('active');
             render();
             document.querySelectorAll('.view-settings').forEach(e=>e.classList.remove('active'));
@@ -667,8 +768,10 @@
             filtered.forEach(s => {
                 let d = document.createElement('div'); d.className = 'card';
                 d.onclick = () => openL(s.id);
+                // Strip tags for preview
+                let preview = s.l.replace(/<br>/g, " ").substring(0, 100);
                 d.innerHTML = `
-                    <div class="card-cover" style="background:${s.bg}"><div class="card-cover-text">${s.l}</div></div>
+                    <div class="card-cover" style="background:${s.bg}"><div class="card-cover-text">${preview}</div></div>
                     <div class="card-body">
                         <div class="song-title">${s.t}</div>
                         <div class="song-singer"><i class="fas fa-microphone"></i> ${s.s}</div>
@@ -684,17 +787,17 @@
             const s = songs.find(x => x.id === id);
             document.getElementById('lv-title').innerText = s.t;
             document.getElementById('lv-singer').innerText = s.s;
-            document.getElementById('lv-text').innerText = s.l;
+            document.getElementById('lv-text').innerHTML = s.l; // Use innerHTML
             
-            // Carousel Related Songs (Infinite Loop)
             const track = document.getElementById('rel-track'); track.innerHTML = '';
-            // Clone list to make it seamless
             let rel = songs.filter(x => x.id !== id).concat(songs.filter(x => x.id !== id));
             
             rel.forEach(r => {
                 let rc = document.createElement('div'); rc.className = 'rel-card';
                 rc.onclick = () => { openL(r.id); document.getElementById('lyrics-view').scrollTop = 0; };
-                rc.innerHTML = `<div class="rel-cover" style="background:${r.bg}">${r.l.substring(0,40)}...</div>
+                // Strip tags for preview
+                let preview = r.l.replace(/<br>/g, " ").substring(0, 40);
+                rc.innerHTML = `<div class="rel-cover" style="background:${r.bg}">${preview}...</div>
                 <div class="rel-info"><div class="rel-t">${r.t}</div><div class="rel-s">${r.s}</div></div>`;
                 track.appendChild(rc);
             });
@@ -710,110 +813,62 @@
         }
 
         function copyL() {
+            // Get text content (strips tags)
             const t = document.getElementById('lv-text').innerText;
             const ta = document.createElement('textarea'); ta.value = t; document.body.appendChild(ta); ta.select();
             try { document.execCommand('copy'); alert('Copied!'); } catch(e){} document.body.removeChild(ta);
         }
 
-        /* --- ADVANCED PPT LOGIC (Rich Design) --- */
-        function dlPPT() {
-            const t = document.getElementById('lv-title').innerText;
-            const s = document.getElementById('lv-singer').innerText;
-            const l = document.getElementById('lv-text').innerText;
-            
-            let pptx = new PptxGenJS(); 
-            pptx.layout = 'LAYOUT_16x9';
-            
-            // 1. Define Professional Master Slide (Gradient BG + Glass Card)
-            pptx.defineSlideMaster({
-                title: "GLASS_THEME",
-                background: { fill: "F8F9FD" }, // Fallback
-                objects: [
-                    // 1. Full Slide Gradient Background
-                    { 
-                        rect: { x: 0, y: 0, w: "100%", h: "100%", fill: { type: "gradient", color: ["6C5CE7", "a29bfe"], angle: 45 } } 
-                    },
-                    // 2. The "Glass" Card (White Rect with Transparency)
-                    { 
-                        rect: { 
-                            x: 0.5, y: 0.5, w: "9.0", h: "4.6", 
-                            fill: { color: "FFFFFF", transparency: 15 }, 
-                            r: 0.2, // Rounded corners
-                            line: { color: "FFFFFF", width: 1, transparency: 40 },
-                            shadow: { type: 'outer', color: '000000', blur: 10, offset: 5, opacity: 0.3 }
-                        } 
-                    },
-                    // 3. Footer Branding
-                    { 
-                        text: { 
-                            text: "Kirubai Payanam | Tamil Christian Lyrics", 
-                            options: { x: 0.5, y: 5.2, w: 9, h: 0.3, align: 'center', color: "FFFFFF", fontSize: 10, transparency: 20 } 
-                        } 
-                    }
-                ]
-            });
-
-            // --- SLIDE 1: TITLE SLIDE ---
-            let s1 = pptx.addSlide({ masterName: "GLASS_THEME" });
-            
-            // Song Title (Big & Bold)
-            s1.addText(t, { 
-                x: 1, y: 1.5, w: '80%', h: 1.5, 
-                fontSize: 54, align: 'center', color: 'FFFFFF', bold: true, fontFace: 'Arial',
-                shadow: { type: 'outer', color: '000000', blur: 3, offset: 2, opacity: 0.3 }
-            });
-            
-            // Singer Name
-            s1.addText(s, { 
-                x: 1, y: 3.2, w: '80%', h: 0.5, 
-                fontSize: 28, align: 'center', color: 'F0F0F0', italic: true, fontFace: 'Arial' 
-            });
-
-            // --- SLIDE 2+: LYRICS SLIDES ---
-            // Split by double newline (Stanza) or every 4 lines
-            let chunks = l.split(/\n\n+/); 
-            if (chunks.length < 2 || chunks[0].length > 300) {
-                let lines = l.split('\n').filter(x => x.trim());
-                chunks = [];
-                for(let i=0; i<lines.length; i+=4) {
-                    chunks.push(lines.slice(i, i+4).join('\n'));
-                }
-            }
-
-            chunks.forEach(chunk => {
-                let slide = pptx.addSlide({ masterName: "GLASS_THEME" });
-                
-                // Small Header (Song Title)
-                slide.addText(t, { 
-                    x: 0.8, y: 0.7, w: '80%', h: 0.4, 
-                    fontSize: 14, color: 'E0E0E0', bold: true, align: 'left', fontFace: 'Arial' 
-                });
-                
-                // Lyrics Content (Centered in Glass Card)
-                slide.addText(chunk.trim(), { 
-                    x: 1, y: 1.2, w: '80%', h: '60%', 
-                    fontSize: 36, align: 'center', color: 'FFFFFF', 
-                    valign: 'middle', lineSpacing: 42, fontFace: 'Arial',
-                    shadow: { type: 'outer', color: '000000', blur: 2, offset: 1, opacity: 0.4 }
-                });
-            });
-            
-            pptx.writeFile({ fileName: t + ".pptx" });
-        }
-
         function dlPDF() {
             const t = document.getElementById('lv-title').innerText;
-            const l = document.getElementById('lv-text').innerText;
+            const s = document.getElementById('lv-singer').innerText;
+            const l = document.getElementById('lv-text').innerHTML; 
+            
             const el = document.createElement('div');
-            el.innerHTML = `<div style="padding:40px; font-family:sans-serif; border:5px solid #6c5ce7;"><h1 style="color:#6c5ce7">${t}</h1><pre style="font-size:16px;">${l}</pre></div>`;
-            html2pdf().set({margin:0.5, filename:t+'.pdf'}).from(el).save();
+            el.style.cssText = "padding: 40px; font-family: 'Helvetica', sans-serif; border: 5px solid #6c5ce7; height: 100%; background: #fff;";
+            el.innerHTML = `
+                <div style="text-align:center; margin-bottom:30px;">
+                    <h1 style="color:#6c5ce7; margin:0;">${t}</h1>
+                    <h3 style="color:#636e72; font-style:italic; margin-top:5px;">${s}</h3>
+                </div>
+                <hr style="margin:20px 0; border:0; border-top:1px solid #eee;">
+                <div style="font-size:16px; line-height:2; color:#2d3436; text-align:left;">
+                    ${l}
+                </div>
+                <div style="margin-top:50px; font-size:12px; color:#b2bec3; text-align:center;">Generated by Kirubai Payanam App</div>
+            `;
+            html2pdf().set({margin:0.5, filename:t+'.pdf', image:{type:'jpeg',quality:0.98}, html2canvas:{scale:2}}).from(el).save();
         }
 
         function dlHTML() {
             const t = document.getElementById('lv-title').innerText;
-            const l = document.getElementById('lv-text').innerText.replace(/\n/g, '<br>');
-            const b = new Blob([`<html><body style="font-family:sans-serif; padding:40px; background:#f0f0f0;"><div style="background:white; padding:40px; border-radius:10px;"><h1 style="color:#6c5ce7">${t}</h1><p>${l}</p></div></body></html>`], {type:'text/html'});
+            const l = document.getElementById('lv-text').innerHTML;
+            const b = new Blob([`<html><head><title>${t}</title></head><body style="font-family:sans-serif; background:#f8f9fd; padding:40px; display:flex; justify-content:center;"><div style="background:white; padding:50px; border-radius:15px; box-shadow:0 10px 40px rgba(0,0,0,0.1); max-width:800px; width:100%; text-align:center;"><h1 style="color:#6c5ce7; margin-bottom:10px;">${t}</h1><hr style="border:0; border-top:1px solid #eee; margin:20px 0;"><div style="font-size:20px; line-height:2.2; color:#333;">${l}</div></div></body></html>`], {type:'text/html'});
             const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = t+".html"; a.click();
+        }
+
+        /* --- SEARCH TOGGLE --- */
+        function toggleSearch() {
+            const overlay = document.getElementById('search-overlay');
+            const inp = document.getElementById('inp-search');
+            if(overlay.classList.contains('open')) {
+                overlay.classList.remove('open');
+            } else {
+                overlay.classList.add('open');
+                setTimeout(()=>inp.focus(), 100);
+            }
+        }
+
+        function toggleCarousel() {
+            const track = document.getElementById('rel-track');
+            const btn = document.getElementById('c-toggle');
+            if(track.classList.contains('paused')) {
+                track.classList.remove('paused');
+                btn.innerHTML = '<i class="fas fa-pause"></i>';
+            } else {
+                track.classList.add('paused');
+                btn.innerHTML = '<i class="fas fa-play"></i>';
+            }
         }
 
         /* --- SETTINGS --- */
@@ -828,7 +883,8 @@
         
         function upCSS(v, val, id) { document.documentElement.style.setProperty(v, val); if(id) document.getElementById(id).innerText = val; }
         function setTheme(c, el) { document.documentElement.style.setProperty('--primary', c); document.querySelectorAll('.theme-circle').forEach(e=>e.classList.remove('active')); el.classList.add('active'); }
-        function toggleDark(v) { if(v) document.body.setAttribute('data-theme', 'dark'); else document.body.removeAttribute('data-theme'); }
+        function toggleDark(v) { if(v) document.documentElement.setAttribute('data-theme', 'dark'); else document.documentElement.removeAttribute('data-theme'); }
+        function toggleAnim(v) { if(v) document.body.classList.add('no-anim'); else document.body.classList.remove('no-anim'); }
         function setDensity(v, el) { document.querySelectorAll('.ls-b').forEach(b => b.classList.remove('active')); el.classList.add('active'); }
         function setGlobalFont(f, el) { document.body.style.fontFamily = f + ', sans-serif'; }
         function setBg(v, el) { if(v==='simple') document.body.classList.add('simple-bg'); else document.body.classList.remove('simple-bg'); }
