@@ -10,14 +10,16 @@
     <!-- Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- PDF Library Only -->
+    <!-- PDF & PPT Libraries -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/pptxgenjs@3.12.0/dist/pptxgen.bundle.js"></script>
 
     <style>
         /* --- RESET & VARIABLES --- */
         * { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
         
         :root {
+            /* Theme Colors */
             --primary: #6c5ce7;
             --primary-light: #a29bfe;
             --bg: #f8f9fd;
@@ -33,9 +35,10 @@
             --cover-height: 180px;
             --shadow-opacity: 0.08;
             --title-size: 18px;
-            --anim-speed: 30s;
+            --anim-speed: 20s;
             --global-font: 'Poppins', sans-serif;
             --ui-padding: 20px;
+            --global-line-height: 1.6;
             
             /* LIST & LETTER SETTINGS */
             --list-item-height: 80px;
@@ -67,24 +70,44 @@
         body {
             font-family: var(--global-font);
             margin: 0; padding: 0;
-            background-color: var(--bg);
+            background-color: transparent; 
             color: var(--text-main);
             transition: 0.3s;
             overflow-x: hidden;
             min-height: 100vh;
             display: flex; flex-direction: column;
-            padding-bottom: 80px; /* Space for mobile nav */
         }
 
         /* --- BACKGROUND ANIMATION --- */
-        .bg-anim { position: fixed; top:0; left:0; width:100%; height:100%; z-index:-1; overflow:hidden; }
-        .blob { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.4; animation: float 20s infinite ease-in-out; }
-        .blob:nth-child(1) { width: 400px; height: 400px; background: var(--primary); top: -100px; left: -100px; opacity: 0.15; }
-        .blob:nth-child(2) { width: 300px; height: 300px; background: #00b894; bottom: -50px; right: -50px; opacity: 0.15; animation-delay: -5s; }
+        .bg-anim { 
+            position: fixed; top:0; left:0; width:100%; height:100%; 
+            z-index: 0; overflow:hidden; 
+            background-color: var(--bg); 
+            pointer-events: none; 
+        }
+        .blob { 
+            position: absolute; border-radius: 50%; filter: blur(80px); 
+            opacity: 0.4; animation: float var(--anim-speed) infinite ease-in-out; 
+        }
+        .blob:nth-child(1) { 
+            width: 400px; height: 400px; background: var(--primary); 
+            top: -100px; left: -100px; opacity: 0.25; 
+        }
+        .blob:nth-child(2) { 
+            width: 300px; height: 300px; background: #00b894; 
+            bottom: -50px; right: -50px; opacity: 0.25; animation-delay: -5s; 
+        }
         @keyframes float { 0%,100%{transform:translate(0,0);} 50%{transform:translate(30px,-30px);} }
+        
         body.no-anim .blob { display: none; }
         body.simple-bg { background: var(--bg); } 
         body.simple-bg .bg-anim { display: none; }
+
+        /* --- CONTENT LAYERING --- */
+        header, .body-controls, #container, .app-footer {
+            position: relative; 
+            z-index: 1;
+        }
 
         /* --- HEADER --- */
         header {
@@ -94,75 +117,103 @@
             box-shadow: var(--shadow);
             border-bottom: 1px solid var(--border);
             backdrop-filter: blur(12px);
-            transition: all 0.3s ease;
         }
 
-        .header-main { display: flex; justify-content: space-between; align-items: center; max-width: 1600px; margin: 0 auto; position: relative; }
+        .header-main { 
+            display: flex; justify-content: space-between; align-items: center; 
+            max-width: 1600px; margin: 0 auto; position: relative;
+        }
+
+        .logo { display: flex; align-items: center; gap: 12px; font-weight: 800; font-size: 20px; color: var(--primary); letter-spacing: -0.5px; }
+        .logo i { 
+            background: var(--primary); color: white; width: 35px; height: 35px; 
+            border-radius: 10px; display: flex; align-items: center; justify-content: center; 
+            font-size: 16px; transform: rotate(-5deg); box-shadow: 0 4px 10px rgba(108, 92, 231, 0.4); 
+        }
+
+        .desktop-actions { display: flex; align-items: center; gap: 15px; }
         
-        .logo { display: flex; align-items: center; gap: 12px; font-weight: 800; font-size: 22px; color: var(--primary); letter-spacing: -0.5px; }
-        .logo i { background: var(--primary); color: white; width: 38px; height: 38px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 16px; transform: rotate(-5deg); box-shadow: 0 4px 10px rgba(108, 92, 231, 0.3); }
-
-        /* Header Actions (Right Side) */
-        .header-actions { display: flex; align-items: center; gap: 15px; }
-
-        /* Icon Only View Switcher */
-        .view-switch { display: flex; gap: 5px; background: rgba(0,0,0,0.03); padding: 4px; border-radius: 50px; border: 1px solid var(--border); }
-        .v-icon-btn { 
-            width: 36px; height: 36px; border-radius: 50%; border: none; background: transparent; 
-            cursor: pointer; color: var(--text-sub); display: flex; align-items: center; justify-content: center; transition: 0.2s; font-size: 16px;
+        .mobile-menu-btn {
+            display: none; width: 40px; height: 40px; border-radius: 50%;
+            background: rgba(0,0,0,0.03); border: none; color: var(--text-main);
+            font-size: 18px; cursor: pointer; transition: 0.2s;
+            align-items: center; justify-content: center;
         }
-        .v-icon-btn:hover { color: var(--primary); background: rgba(255,255,255,0.5); }
-        .v-icon-btn.active { background: var(--surface); color: var(--primary); box-shadow: 0 2px 8px rgba(0,0,0,0.1); transform: scale(1.05); }
+        .mobile-menu-btn:hover, .mobile-menu-btn.active { background: var(--primary); color: white; }
 
-        /* Search Toggle Button */
-        .search-toggle {
+        .mobile-actions-dropdown {
+            display: none; position: absolute; top: 60px; right: 0;
+            background: var(--surface); border-radius: 16px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1); padding: 15px;
+            flex-direction: column; gap: 10px; border: 1px solid var(--border);
+            animation: slideDown 0.2s ease-out; z-index: 1000; width: 200px;
+        }
+        @keyframes slideDown { from { opacity:0; transform: translateY(-10px); } to { opacity:1; transform: translateY(0); } }
+        
+        .mobile-action-item {
+            display: flex; align-items: center; gap: 10px; padding: 10px;
+            border-radius: 10px; color: var(--text-main); font-weight: 500; cursor: pointer;
+            transition: 0.2s;
+        }
+        .mobile-action-item:hover { background: rgba(0,0,0,0.03); color: var(--primary); }
+
+        @media (max-width: 768px) {
+            .desktop-actions { display: none; }
+            .mobile-menu-btn { display: flex; }
+        }
+
+        .header-icon-btn {
             width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--border);
             background: var(--surface); color: var(--text-main); cursor: pointer;
-            display: flex; align-items: center; justify-content: center; font-size: 18px; transition: 0.3s;
+            display: flex; align-items: center; justify-content: center; font-size: 16px; transition: 0.3s;
         }
-        .search-toggle:hover, .search-toggle.active { background: var(--primary); color: white; border-color: var(--primary); }
+        .header-icon-btn:hover { background: var(--primary); color: white; border-color: var(--primary); transform: rotate(15deg); }
+        .header-icon-btn.fav-active { background: #ff7675; color: white; border-color: #ff7675; }
 
-        /* Expandable Search Bar */
         .search-overlay {
-            max-height: 0; overflow: hidden; transition: max-height 0.4s ease-out, opacity 0.3s;
+            max-height: 0; overflow: hidden; transition: max-height 0.4s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s, margin-top 0.3s;
             opacity: 0; margin-top: 0;
         }
         .search-overlay.open { max-height: 80px; opacity: 1; margin-top: 15px; }
         
-        .search-input-wrap {
-            position: relative; max-width: 800px; margin: 0 auto;
-        }
+        .search-input-wrap { position: relative; max-width: 800px; margin: 0 auto; display: flex; align-items: center; }
         .search-input-wrap input {
-            width: 100%; padding: 15px 50px 15px 25px; border-radius: 50px; border: 2px solid var(--primary);
+            width: 100%; padding: 12px 50px 12px 25px; border-radius: 50px; border: 2px solid var(--primary);
             background: var(--bg); color: var(--text-main); font-size: 16px; outline: none;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
         }
-        .search-close {
-            position: absolute; right: 20px; top: 50%; transform: translateY(-50%);
-            cursor: pointer; color: var(--text-sub);
-        }
+        .search-close { position: absolute; right: 20px; cursor: pointer; color: var(--text-sub); font-size: 18px; }
 
-        /* Settings Button */
-        .settings-btn {
-            width: 40px; height: 40px; border-radius: 50%; background: transparent;
-            border: none; display: flex; align-items: center; justify-content: center; 
-            cursor: pointer; color: var(--text-sub); transition: 0.2s; font-size: 20px;
-        }
-        .settings-btn:hover { color: var(--primary); transform: rotate(90deg); }
-
-        /* Categories */
         .cat-bar {
-            display: flex; gap: 12px; overflow-x: auto; padding: 15px 0 5px;
+            display: flex; gap: 10px; overflow-x: auto; padding: 15px 0 5px;
             max-width: 1600px; margin: 0 auto; scrollbar-width: none;
         }
         .cat-chip {
             padding: 8px 20px; border-radius: 30px; background: var(--surface);
             border: 1px solid var(--border); color: var(--text-sub); cursor: pointer;
             font-size: 13px; white-space: nowrap; font-weight: 600; transition: 0.2s;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.02);
         }
         .cat-chip:hover { border-color: var(--primary); color: var(--primary); transform: translateY(-2px); }
-        .cat-chip.active { background: var(--primary); color: white; border-color: var(--primary); box-shadow: 0 6px 15px rgba(108, 92, 231, 0.3); }
+        .cat-chip.active { background: var(--primary); color: white; border-color: var(--primary); box-shadow: 0 4px 10px rgba(108, 92, 231, 0.3); }
+
+        /* --- BODY CONTROLS --- */
+        .body-controls {
+            max-width: 1600px; margin: 20px auto 0; padding: 0 5%;
+            display: flex; justify-content: flex-end;
+        }
+        
+        .view-switch { 
+            display: flex; gap: 5px; background: rgba(0,0,0,0.03); padding: 4px; 
+            border-radius: 50px; border: 1px solid var(--border); 
+        }
+        .v-icon-btn { 
+            width: 36px; height: 36px; border-radius: 50%; border: none; background: transparent; 
+            cursor: pointer; color: var(--text-sub); display: flex; align-items: center; justify-content: center; 
+            transition: 0.2s; font-size: 16px;
+        }
+        .v-icon-btn:hover { color: var(--primary); background: rgba(255,255,255,0.5); }
+        .v-icon-btn.active { background: var(--surface); color: var(--primary); box-shadow: 0 2px 8px rgba(0,0,0,0.1); transform: scale(1.05); }
+
 
         /* --- SETTINGS MODAL --- */
         #settings-modal {
@@ -180,249 +231,172 @@
 
         .s-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; border-bottom: 2px solid var(--border); padding-bottom: 15px; }
         .s-title { font-size: 20px; font-weight: 800; color: var(--primary); }
-        
-        .s-section-title { 
-            font-size: 12px; font-weight: 800; color: var(--text-sub); text-transform: uppercase; 
-            margin: 25px 0 15px; letter-spacing: 1.5px; display: flex; align-items: center; gap: 10px;
-        }
+        .s-section-title { font-size: 12px; font-weight: 800; color: var(--text-sub); text-transform: uppercase; margin: 25px 0 15px; letter-spacing: 1.5px; display: flex; align-items: center; gap: 10px; }
         .s-section-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
-        
         .s-item { margin-bottom: 22px; }
         .s-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
         .s-label { font-size: 15px; font-weight: 600; display:flex; align-items:center; gap:8px; }
         .s-val { font-size: 13px; color: var(--primary); font-weight: 700; background: rgba(108, 92, 231, 0.1); padding: 3px 10px; border-radius: 6px; }
-        
         input[type=range] { width: 100%; accent-color: var(--primary); height: 8px; background: #ddd; border-radius: 5px; -webkit-appearance: none; }
-        input[type=range]::-webkit-slider-thumb { 
-            -webkit-appearance: none; width: 22px; height: 22px; background: var(--surface); 
-            border: 5px solid var(--primary); border-radius: 50%; cursor: pointer; 
-            box-shadow: 0 3px 8px rgba(0,0,0,0.2); transition: transform 0.1s;
-        }
+        input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 22px; height: 22px; background: var(--surface); border: 5px solid var(--primary); border-radius: 50%; cursor: pointer; box-shadow: 0 3px 8px rgba(0,0,0,0.2); transition: transform 0.1s; }
         input[type=range]::-webkit-slider-thumb:hover { transform: scale(1.1); }
-
         .toggle { position: relative; width: 50px; height: 28px; }
         .toggle input { opacity: 0; width: 0; height: 0; }
         .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .3s; border-radius: 34px; }
         .slider:before { position: absolute; content: ""; height: 22px; width: 22px; left: 3px; bottom: 3px; background-color: white; transition: .3s; border-radius: 50%; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
         input:checked + .slider { background-color: var(--primary); }
         input:checked + .slider:before { transform: translateX(22px); }
-
         .theme-row { display: flex; gap: 15px; justify-content: space-between; }
         .theme-circle { width: 45px; height: 45px; border-radius: 50%; cursor: pointer; border: 3px solid transparent; transition: 0.2s; position: relative; }
         .theme-circle.active { transform: scale(1.15); border-color: var(--text-main); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
-
-        .reset-btn {
-            width: 100%; padding: 14px; 
-            border: 2px dashed var(--primary); color: var(--primary);
-            background: rgba(108, 92, 231, 0.05); border-radius: 14px; 
-            font-weight: 700; cursor: pointer; margin-top: 30px; font-size: 14px;
-            transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px;
-        }
+        .reset-btn { width: 100%; padding: 14px; border: 2px dashed var(--primary); color: var(--primary); background: rgba(108, 92, 231, 0.05); border-radius: 14px; font-weight: 700; cursor: pointer; margin-top: 30px; font-size: 14px; transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; }
         .reset-btn:hover { background: var(--primary); color: white; border-style: solid; }
-
         .view-specific-settings { display: none; }
         .view-specific-settings.active { display: block; }
-        
         .ls-grp { display: flex; gap: 5px; background: rgba(0,0,0,0.05); padding: 4px; border-radius: 12px; width: 100%; }
         .ls-b { flex: 1; padding: 8px; border: none; background: transparent; cursor: pointer; color: inherit; border-radius: 8px; font-size: 14px; font-weight: 600; transition: 0.2s; }
         .ls-b:hover { background: rgba(0,0,0,0.05); }
         .ls-b.active { background: var(--surface); color: var(--primary); box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
 
         /* --- CONTENT VIEWS --- */
-        #container { flex: 1; padding: 20px 5%; width: 100%; max-width: 100%; box-sizing: border-box; }
+        #container { flex: 1; padding: 10px 5% 30px; width: 100%; max-width: 1600px; margin: 0 auto; box-sizing: border-box; }
         
-        /* 1. LETTER VIEW (Default) */
+        /* 1. LETTER VIEW (Modified to 2 Columns) */
         .letter-group { margin-bottom: 35px; }
         .letter-head { 
             font-size: 24px; font-weight: 800; color: var(--primary); 
-            border-bottom: 3px solid var(--bg); margin-bottom: 18px; padding-bottom: 5px; 
+            border-bottom: 3px solid var(--border); margin-bottom: 18px; padding-bottom: 5px; 
             display: inline-block; padding-right: 30px;
         }
-        .letter-items { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 15px; }
+        .letter-items { 
+            display: grid; 
+            grid-template-columns: repeat(2, 1fr); /* FORCED 2 COLUMNS */
+            gap: 15px; 
+        }
+        @media (max-width: 768px) {
+            .letter-items { grid-template-columns: 1fr; } /* 1 Column on Mobile */
+        }
+
         .l-item {
             background: var(--surface); padding: 20px 25px; border-radius: 16px;
-            border: 1px solid var(--border); cursor: pointer; display: flex; justify-content: space-between; align-items: center; 
+            border: 1px solid var(--border); cursor: pointer; display: flex; align-items: center; 
             transition: all 0.2s; box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+            position: relative; /* For Fav Btn positioning if needed, but we use flex */
+            gap: 10px;
         }
         .l-item:hover { border-left: 6px solid var(--primary); transform: translateX(8px); box-shadow: 0 10px 25px rgba(0,0,0,0.08); }
+        .l-info-wrap { flex: 1; display: flex; justify-content: space-between; align-items: center; }
         .l-text { font-size: var(--letter-font-size); font-weight: 600; color: var(--text-main); }
         .l-singer { font-size: 12px; color: var(--text-sub); background: var(--bg); padding: 5px 12px; border-radius: 12px; font-weight: 500; }
 
+        /* Card Fav Button */
+        .fav-btn-card {
+            position: absolute; top: 10px; right: 10px;
+            width: 32px; height: 32px; border-radius: 50%;
+            background: rgba(255,255,255,0.9); border: none;
+            color: #ccc; cursor: pointer; z-index: 5;
+            display: flex; align-items: center; justify-content: center;
+            transition: 0.2s; box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .fav-btn-card.active { color: #e74c3c; background: #fff; transform: scale(1.1); }
+        .fav-btn-card:hover { transform: scale(1.1); color: #e74c3c; }
+
+        /* Letter View Fav Button */
+        .fav-btn-letter {
+            width: 30px; height: 30px; border-radius: 50%;
+            background: transparent; border: 1px solid var(--border);
+            color: #ccc; cursor: pointer; display: flex; align-items: center; justify-content: center;
+            transition: 0.2s; flex-shrink: 0;
+        }
+        .fav-btn-letter:hover, .fav-btn-letter.active { color: #e74c3c; border-color: #e74c3c; background: rgba(231, 76, 60, 0.05); }
+
         /* 2. GRID VIEW */
-        .grid-layout { 
-            display: grid; gap: 30px; 
-            grid-template-columns: repeat(auto-fill, minmax(var(--card-width), 1fr)); 
-        }
-        
-        .card {
-            background: var(--surface); border-radius: var(--card-radius);
-            overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,var(--shadow-opacity));
-            cursor: pointer; transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-            display: flex; flex-direction: column; border: 1px solid rgba(0,0,0,0.03);
-            height: 100%; position: relative;
-        }
+        .grid-layout { display: grid; gap: 30px; grid-template-columns: repeat(auto-fill, minmax(var(--card-width), 1fr)); }
+        .card { background: var(--surface); border-radius: var(--card-radius); overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,var(--shadow-opacity)); cursor: pointer; transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); display: flex; flex-direction: column; border: 1px solid rgba(0,0,0,0.03); height: 100%; position: relative; }
         .card:hover { transform: translateY(-10px); box-shadow: 0 25px 50px rgba(0,0,0,0.15); border-color: rgba(108, 92, 231, 0.2); }
-
-        .card-cover {
-            height: var(--cover-height); display: flex; align-items: center; justify-content: center;
-            padding: 25px; color: white; text-align: center; position: relative;
-            background-size: 200% 200%; animation: grad 8s infinite;
-        }
+        .card-cover { height: var(--cover-height); display: flex; align-items: center; justify-content: center; padding: 25px; color: white; text-align: center; position: relative; background-size: 200% 200%; animation: grad 8s infinite; }
         @keyframes grad { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
-        
-        .card-cover-text {
-            font-family: 'Noto Sans Tamil', sans-serif; font-size: 16px; font-weight: 600;
-            line-height: 1.6; text-shadow: 0 3px 6px rgba(0,0,0,0.3);
-            display: -webkit-box; -webkit-line-clamp: 5; -webkit-box-orient: vertical; overflow: hidden;
-            font-style: italic; letter-spacing: 0.5px;
-        }
-
+        .card-cover-text { font-family: 'Noto Sans Tamil', sans-serif; font-size: 16px; font-weight: 600; line-height: 1.6; text-shadow: 0 3px 6px rgba(0,0,0,0.3); display: -webkit-box; -webkit-line-clamp: 5; -webkit-box-orient: vertical; overflow: hidden; font-style: italic; letter-spacing: 0.5px; }
         .card-body { padding: 22px; display: flex; flex-direction: column; gap: 10px; flex-grow: 1; }
         .card-title { font-size: var(--title-size); font-weight: 700; line-height: 1.4; color: var(--text-main); }
         .card-sub { font-size: 13px; color: var(--text-sub); display: flex; align-items: center; gap: 6px; font-weight: 500; }
-        
         .card-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: auto; padding-top: 15px; border-top: 1px dashed var(--border); }
         .c-tag { font-size: 11px; background: var(--bg); color: var(--text-sub); padding: 5px 12px; border-radius: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
 
         /* 3. LIST VIEW */
-        .list-layout { 
-            display: grid; gap: 15px;
-            grid-template-columns: 1fr;
-        }
+        .list-layout { display: grid; gap: 15px; grid-template-columns: 1fr; }
         @media (min-width: 768px) { .list-layout { grid-template-columns: repeat(2, 1fr); } }
         @media (min-width: 1200px) { .list-layout { grid-template-columns: repeat(3, 1fr); } }
-
         .list-mode .card { flex-direction: row; height: var(--list-item-height); align-items: center; border-radius: 16px; }
         .list-mode .card-cover { width: var(--list-item-height); height: 100%; padding: 5px; flex-shrink: 0; border-radius: 0; }
         .list-mode .card-cover-text { font-size: 10px; line-height: 1.3; -webkit-line-clamp: 3; }
         .list-mode .card-body { padding: 0 20px; justify-content: center; border-left: 1px solid var(--border); }
         .list-mode .card-tags { display: none; }
+        /* Adjust fav btn for List View */
+        .list-mode .fav-btn-card { top: 50%; transform: translateY(-50%); right: 15px; background: transparent; color: var(--text-sub); box-shadow: none; }
+        .list-mode .fav-btn-card.active { background: transparent; color: #e74c3c; transform: translateY(-50%) scale(1.2); }
+        .list-mode .fav-btn-card:hover { transform: translateY(-50%) scale(1.2); }
 
         /* --- LYRICS PAGE --- */
-        #lyrics-view {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: var(--l-bg); color: var(--l-text);
-            z-index: 2000; display: none; flex-direction: column; overflow-y: auto;
-            animation: slideIn 0.4s cubic-bezier(0.19, 1, 0.22, 1);
-        }
+        #lyrics-view { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--l-bg); color: var(--l-text); z-index: 2000; display: none; flex-direction: column; overflow-y: auto; animation: slideIn 0.4s cubic-bezier(0.19, 1, 0.22, 1); }
         @keyframes slideIn { from{transform:translateY(100%);} to{transform:translateY(0);} }
-
-        .lv-header {
-            position: sticky; top: 0; background: var(--l-bg); padding: 15px 5%;
-            display: flex; align-items: center; justify-content: space-between;
-            border-bottom: 1px solid rgba(0,0,0,0.05); z-index: 10;
-            transition: background 0.3s;
-        }
-        .lv-btn {
-            width: 45px; height: 45px; border-radius: 50%; background: rgba(0,0,0,0.05);
-            border: none; cursor: pointer; color: var(--l-text); font-size: 18px;
-            display: flex; align-items: center; justify-content: center; transition: 0.2s;
-        }
+        .lv-header { position: sticky; top: 0; background: var(--l-bg); padding: 15px 5%; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(0,0,0,0.05); z-index: 10; transition: background 0.3s; }
+        .lv-btn { width: 45px; height: 45px; border-radius: 50%; background: rgba(0,0,0,0.05); border: none; cursor: pointer; color: var(--l-text); font-size: 18px; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
         .lv-btn:hover { background: var(--primary); color: white; }
+        /* Favorite Toggle Active State */
+        .lv-btn.liked { color: #e74c3c; background: rgba(231, 76, 60, 0.1); }
+        .lv-btn.liked:hover { background: #e74c3c; color: white; }
 
-        /* Animated Download Buttons */
-        .dl-container {
-            display: flex; gap: 15px; justify-content: center; padding: 30px;
-            flex-wrap: wrap; background: rgba(0,0,0,0.02);
-            border-bottom: 1px solid rgba(0,0,0,0.05);
-        }
-        .dl-chip {
-            padding: 12px 24px; border-radius: 30px; font-size: 14px; font-weight: 700;
-            color: white; border: none; cursor: pointer; display: flex; align-items: center; gap: 10px;
-            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); position: relative; overflow: hidden;
-        }
+        .dl-container { display: flex; gap: 15px; justify-content: center; padding: 30px; flex-wrap: wrap; background: rgba(0,0,0,0.02); border-bottom: 1px solid rgba(0,0,0,0.05); }
+        .dl-chip { padding: 12px 24px; border-radius: 30px; font-size: 14px; font-weight: 700; color: white; border: none; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); position: relative; overflow: hidden; }
         .dl-chip:hover { transform: translateY(-4px); box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
         .dl-chip::after { content:''; position:absolute; top:0; left:-100%; width:100%; height:100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent); transition:0.5s; }
         .dl-chip:hover::after { left:100%; }
-        
         .pdf-c { background: linear-gradient(135deg, #e74c3c, #c0392b); }
         .html-c { background: linear-gradient(135deg, #3498db, #2980b9); }
 
-        .lv-content {
-            padding: 50px 5%; max-width: 1200px; margin: 0 auto; width: 100%;
-            font-family: var(--l-font); font-size: var(--l-size); line-height: var(--l-height);
-            text-align: var(--l-align); white-space: pre-wrap; transition: all 0.3s;
-            letter-spacing: var(--l-spacing); text-transform: var(--l-transform);
-            min-height: 50vh;
+        .lv-content { 
+            padding: 50px 5%; max-width: 1000px; margin: 0 auto; width: 100%; 
+            font-family: var(--l-font); font-size: var(--l-size); line-height: var(--l-height); 
+            text-align: var(--l-align); 
+            white-space: normal; /* CHANGED FROM PRE-WRAP TO NORMAL to fix formatting */
+            transition: all 0.3s; letter-spacing: var(--l-spacing); text-transform: var(--l-transform); 
+            min-height: 50vh; 
         }
 
-        /* Improved Lyrics Settings Popup (Glassmorphism) */
-        #ls-panel {
-            display: none; position: absolute; top: 70px; right: 20px; width: 300px;
-            background: rgba(255, 255, 255, 0.95); color: #333; padding: 25px;
-            border-radius: 24px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); z-index: 20;
-            animation: fadeIn 0.2s; border: 1px solid rgba(0,0,0,0.1);
-            backdrop-filter: blur(15px);
-        }
+        /* Improved Lyrics Settings Popup */
+        #ls-panel { display: none; position: absolute; top: 75px; right: 5%; width: 320px; background: rgba(255, 255, 255, 0.95); color: #333; padding: 25px; border-radius: 24px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); z-index: 20; animation: fadeIn 0.2s; border: 1px solid rgba(0,0,0,0.1); backdrop-filter: blur(15px); }
         [data-theme="dark"] #ls-panel { background: rgba(30, 30, 30, 0.95); color: #fff; border: 1px solid #444; }
-        
-        .ls-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px; }
-        .ls-label { font-size: 11px; font-weight: 800; color: var(--text-sub); text-transform: uppercase; letter-spacing: 0.5px; }
-        
-        .ls-color-dot { width: 24px; height: 24px; border-radius: 50%; border: 1px solid rgba(0,0,0,0.2); cursor: pointer; }
+        .ls-color-dot { width: 28px; height: 28px; border-radius: 50%; border: 1px solid rgba(0,0,0,0.2); cursor: pointer; transition: 0.2s; }
         .ls-color-dot.active { transform: scale(1.2); border: 2px solid var(--primary); }
 
-        /* Carousel Related Songs */
         .rel-sec { background: rgba(0,0,0,0.03); padding: 60px 5%; border-top: 1px solid var(--border); }
-        .rel-title-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 25px; }
-        .rel-title { font-size: 20px; font-weight: 800; color: var(--primary); border-left: 6px solid var(--primary); padding-left: 20px; }
-        
-        .carousel-controls { display: flex; gap: 10px; }
-        .c-btn { 
-            width: 35px; height: 35px; border-radius: 50%; border: 1px solid var(--border); 
-            background: var(--surface); color: var(--text-sub); cursor: pointer; display: flex; 
-            align-items: center; justify-content: center; transition: 0.2s;
-        }
-        .c-btn:hover { background: var(--primary); color: white; border-color: var(--primary); }
-        .c-btn.active { background: var(--primary); color: white; }
-
+        .rel-title { font-size: 20px; font-weight: 800; color: var(--primary); margin-bottom: 25px; border-left: 6px solid var(--primary); padding-left: 20px; }
         .carousel-wrap { overflow: hidden; width: 100%; position: relative; padding: 10px 0; }
-        .carousel-track { display: flex; gap: 20px; animation: scrollLeft var(--anim-speed) linear infinite; width: max-content; }
+        .carousel-track { display: flex; gap: 20px; animation: scrollLeft 40s linear infinite; width: max-content; }
         .carousel-track:hover { animation-play-state: paused; }
-        .carousel-track.paused { animation-play-state: paused; }
-        
         @keyframes scrollLeft { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
-        
-        .rel-card {
-            min-width: 280px; width: 280px; background: var(--card-bg); 
-            border-radius: 20px; overflow: hidden; box-shadow: 0 10px 20px rgba(0,0,0,0.05);
-            cursor: pointer; transition: 0.3s; border: 1px solid var(--border);
-            display: flex; flex-direction: column;
-        }
+        .rel-card { min-width: 250px; width: 250px; background: var(--card-bg); border-radius: 20px; overflow: hidden; box-shadow: 0 10px 20px rgba(0,0,0,0.05); cursor: pointer; transition: 0.3s; border: 1px solid var(--border); display: flex; flex-direction: column; }
         .rel-card:hover { transform: translateY(-8px) scale(1.02); box-shadow: 0 15px 35px rgba(0,0,0,0.15); border-color: var(--primary); }
-        .rel-cover { height: 160px; display: flex; align-items: center; justify-content: center; color: white; font-size: 13px; text-align: center; padding: 15px; background-size: 200%; animation: grad 8s infinite; }
+        .rel-cover { height: 130px; display: flex; align-items: center; justify-content: center; color: white; font-size: 11px; text-align: center; padding: 15px; background-size: 200%; animation: grad 8s infinite; }
         .rel-info { padding: 18px; }
-        .rel-t { font-size: 16px; font-weight: 700; margin-bottom: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--text-main); }
+        .rel-t { font-size: 15px; font-weight: 700; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--text-main); }
         .rel-s { font-size: 12px; color: var(--text-sub); }
-        /* Gradient fade for carousel */
-        .carousel-wrap::before, .carousel-wrap::after { content: ""; position: absolute; top: 0; width: 60px; height: 100%; z-index: 2; pointer-events: none; }
-        .carousel-wrap::before { left: 0; background: linear-gradient(to right, var(--bg), transparent); }
-        .carousel-wrap::after { right: 0; background: linear-gradient(to left, var(--bg), transparent); }
 
-        /* Footer (Enhanced) */
-        .app-footer { 
-            background: #2d3436; color: #dfe6e9; padding: 60px 5% 30px; 
-            margin-top: auto; position: relative; overflow: hidden; font-size: 14px;
-        }
-        .f-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 40px; text-align: left; max-width: 1400px; margin: 0 auto; }
-        
-        .f-col h4 { color: white; margin-bottom: 20px; font-size: 18px; position: relative; display: inline-block; }
+        /* Footer */
+        .app-footer { background: #1a1c20; color: #dfe6e9; padding: 60px 5% 30px; margin-top: auto; border-top: 1px solid #333; }
+        .f-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 40px; max-width: 1400px; margin: 0 auto; text-align: left; }
+        .f-col h4 { font-size: 18px; color: white; margin-bottom: 20px; position: relative; display: inline-block; }
         .f-col h4::after { content: ''; display: block; width: 40px; height: 3px; background: var(--primary); margin-top: 8px; border-radius: 2px; }
-        .f-col p { line-height: 1.6; opacity: 0.8; margin-bottom: 20px; }
-        
+        .f-col p { font-size: 14px; color: #a0aec0; line-height: 1.6; margin-bottom: 20px; }
+        .f-social { display: flex; gap: 15px; }
+        .f-social a { width: 40px; height: 40px; background: rgba(255,255,255,0.05); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; transition: 0.3s; }
+        .f-social a:hover { background: var(--primary); transform: translateY(-3px); }
         .f-links { list-style: none; padding: 0; }
         .f-links li { margin-bottom: 12px; }
-        .f-links a { color: #b2bec3; text-decoration: none; transition: 0.2s; display: flex; align-items: center; gap: 8px; }
-        .f-links a:hover { color: var(--primary-light); padding-left: 5px; }
-        
-        .f-social { display: flex; gap: 15px; margin-top: 10px; }
-        .f-social a { 
-            width: 40px; height: 40px; background: rgba(255,255,255,0.1); border-radius: 50%; 
-            display: flex; align-items: center; justify-content: center; color: white; text-decoration: none; transition: 0.3s; 
-        }
-        .f-social a:hover { background: var(--primary); transform: translateY(-3px); }
-
-        .f-bottom { border-top: 1px solid rgba(255,255,255,0.1); margin-top: 50px; padding-top: 20px; text-align: center; font-size: 12px; opacity: 0.6; }
+        .f-links a { color: #b2bec3; text-decoration: none; font-size: 14px; transition: 0.2s; display: flex; align-items: center; gap: 8px; }
+        .f-links a:hover { color: var(--primary); padding-left: 5px; }
+        .f-bottom { text-align: center; margin-top: 50px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); font-size: 12px; color: #718096; }
 
     </style>
 </head>
@@ -432,29 +406,43 @@
 
     <header>
         <div class="header-main">
-            <div class="logo"><i class="fas fa-music"></i> Kirubai Payanam</div>
-            
-            <div class="header-actions">
-                <!-- Search Toggle -->
-                <button class="search-toggle" onclick="toggleSearch()" title="Search">
-                    <i class="fas fa-search"></i>
-                </button>
-                
-                <!-- View Switcher (Icons Only) -->
-                <div class="desktop-nav">
-                    <button class="v-icon-btn active" id="btn-letter" onclick="setView('letter')" title="A-Z Index"><i class="fas fa-font"></i></button>
-                    <button class="v-icon-btn" id="btn-grid" onclick="setView('grid')" title="Grid View"><i class="fas fa-th-large"></i></button>
-                    <button class="v-icon-btn" id="btn-list" onclick="setView('list')" title="List View"><i class="fas fa-list"></i></button>
-                </div>
+            <!-- Left Controls -->
+            <div class="nav-left">
+                <div class="logo"><i class="fas fa-music"></i> Kirubai Payanam</div>
+            </div>
 
-                <button class="settings-btn" onclick="openSettings()"><i class="fas fa-cog"></i></button>
+            <!-- Right Controls -->
+            <div class="nav-right">
+                <div class="desktop-actions">
+                    <button class="header-icon-btn search-toggle" onclick="toggleSearch()" title="Search">
+                        <i class="fas fa-search"></i>
+                    </button>
+                    <!-- Favorite Header Button -->
+                    <button id="btn-fav-filter" class="header-icon-btn" onclick="toggleFavFilter()" title="Show Favorites">
+                        <i class="fas fa-heart"></i>
+                    </button>
+                    <button class="header-icon-btn settings-btn" onclick="openSettings()" title="Settings">
+                        <i class="fas fa-cog"></i>
+                    </button>
+                </div>
+                <!-- Mobile Menu Trigger -->
+                <button class="mobile-menu-btn" onclick="toggleMobileMenu()">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </div>
+            
+            <!-- Mobile Actions Dropdown -->
+            <div id="mobile-actions" class="mobile-actions-dropdown">
+                <div class="mobile-action-item" onclick="toggleSearch()"><i class="fas fa-search"></i> Search</div>
+                <div class="mobile-action-item" onclick="toggleFavFilter()"><i class="fas fa-heart"></i> Favorites</div>
+                <div class="mobile-action-item" onclick="openSettings()"><i class="fas fa-cog"></i> Settings</div>
             </div>
         </div>
         
         <!-- Expandable Search -->
         <div id="search-overlay" class="search-overlay">
             <div class="search-input-wrap">
-                <input type="text" id="inp-search" placeholder="Search song lyrics, artist or category..." onkeyup="filterSongs()">
+                <input type="text" id="inp-search" placeholder="Search lyrics..." onkeyup="filterSongs()">
                 <i class="fas fa-times search-close" onclick="toggleSearch()"></i>
             </div>
         </div>
@@ -468,15 +456,24 @@
             <button class="cat-chip" onclick="filterCat('Christmas', this)">Christmas</button>
         </div>
     </header>
+    
+    <!-- BODY TOP CONTROLS (View Switcher - Right Aligned) -->
+    <div class="body-controls">
+        <div class="view-switch">
+            <button class="v-icon-btn active" id="btn-letter" onclick="setView('letter')" title="A-Z Index"><i class="fas fa-font"></i></button>
+            <button class="v-icon-btn" id="btn-grid" onclick="setView('grid')" title="Grid View"><i class="fas fa-th-large"></i></button>
+            <button class="v-icon-btn" id="btn-list" onclick="setView('list')" title="List View"><i class="fas fa-list"></i></button>
+        </div>
+    </div>
 
     <div id="container"></div>
 
-    <!-- Main Footer -->
+    <!-- MAIN FOOTER (Home) -->
     <footer class="app-footer">
-        <div class="f-grid">
+        <div class="f-container">
             <div class="f-col">
                 <h4>Kirubai Payanam</h4>
-                <p>Sing unto the Lord a new song, for He has done marvelous things. Your ultimate destination for Tamil Christian lyrics.</p>
+                <p>A dedicated platform for Tamil Christian song lyrics. Worship freely with our curated collection.</p>
                 <div class="f-social">
                     <a href="#"><i class="fab fa-youtube"></i></a>
                     <a href="#"><i class="fab fa-facebook-f"></i></a>
@@ -484,33 +481,26 @@
                 </div>
             </div>
             <div class="f-col">
-                <h4>Explore</h4>
+                <h4>Quick Links</h4>
                 <ul class="f-links">
                     <li><a href="#" onclick="setView('letter')"><i class="fas fa-chevron-right" style="font-size:10px;"></i> A-Z Index</a></li>
-                    <li><a href="#" onclick="setView('grid')"><i class="fas fa-chevron-right" style="font-size:10px;"></i> Browse Cards</a></li>
-                    <li><a href="#" onclick="openSettings()"><i class="fas fa-chevron-right" style="font-size:10px;"></i> Appearance</a></li>
+                    <li><a href="#" onclick="setView('grid')"><i class="fas fa-chevron-right" style="font-size:10px;"></i> Song Cards</a></li>
+                    <li><a href="#" onclick="openSettings()"><i class="fas fa-chevron-right" style="font-size:10px;"></i> Settings</a></li>
                 </ul>
             </div>
             <div class="f-col">
                 <h4>Contact</h4>
                 <ul class="f-links">
                     <li><a href="#"><i class="fas fa-envelope"></i> support@kirubaipayanam.com</a></li>
-                    <li><a href="#"><i class="fas fa-globe"></i> www.kirubaipayanam.com</a></li>
+                    <li><a href="#"><i class="fas fa-phone"></i> +91 98765 43210</a></li>
+                    <li><a href="#"><i class="fas fa-map-marker-alt"></i> Chennai, India</a></li>
                 </ul>
             </div>
         </div>
         <div class="f-bottom">
-            &copy; 2025 Praise & Worship Team. Made with <i class="fas fa-heart" style="color:#ff7675;"></i> for His Glory.
+            &copy; 2025 Praise & Worship Team. Made with <i class="fas fa-heart" style="color:#e74c3c;"></i> for Glory.
         </div>
     </footer>
-
-    <!-- Mobile Bottom Navigation -->
-    <div class="mobile-nav">
-        <div class="m-nav-item active" onclick="setView('letter'); updateMobileNav(this)"><i class="fas fa-font"></i> A-Z</div>
-        <div class="m-nav-item" onclick="setView('grid'); updateMobileNav(this)"><i class="fas fa-th-large"></i> Grid</div>
-        <div class="m-nav-item" onclick="setView('list'); updateMobileNav(this)"><i class="fas fa-list"></i> List</div>
-        <div class="m-nav-item" onclick="toggleSearch()"><i class="fas fa-search"></i> Search</div>
-    </div>
 
     <!-- APP SETTINGS MODAL -->
     <div id="settings-modal" onclick="if(event.target==this)closeSettings()">
@@ -520,31 +510,24 @@
                 <i class="fas fa-times" onclick="closeSettings()" style="cursor:pointer; font-size:20px;"></i>
             </div>
             
-            <div id="set-grid" class="view-settings">
+            <div id="set-grid" class="view-specific-settings">
                 <div class="s-section-title"><i class="fas fa-th-large"></i> Grid Options</div>
                 <div class="s-item"><div class="s-row"><span class="s-label">Card Width</span> <span class="s-val" id="disp-w">280px</span></div><input type="range" min="150" max="400" value="280" oninput="upCSS('--card-width', this.value+'px', 'disp-w')"></div>
                 <div class="s-item"><div class="s-row"><span class="s-label">Cover Height</span> <span class="s-val" id="disp-h">180px</span></div><input type="range" min="100" max="300" value="180" oninput="upCSS('--cover-height', this.value+'px', 'disp-h')"></div>
                 <div class="s-item"><div class="s-row"><span class="s-label">Roundness</span> <span class="s-val" id="disp-r">20px</span></div><input type="range" min="0" max="40" value="20" oninput="upCSS('--card-radius', this.value+'px', 'disp-r')"></div>
             </div>
 
-            <div id="set-list" class="view-settings">
+            <div id="set-list" class="view-specific-settings">
                 <div class="s-section-title"><i class="fas fa-list"></i> List Options</div>
                 <div class="s-item"><div class="s-row"><span class="s-label">Row Height</span> <span class="s-val" id="disp-lh">80px</span></div><input type="range" min="60" max="140" value="80" oninput="upCSS('--list-item-height', this.value+'px', 'disp-lh')"></div>
             </div>
 
-            <div id="set-letter" class="view-settings active">
+            <div id="set-letter" class="view-specific-settings active">
                 <div class="s-section-title"><i class="fas fa-font"></i> List Options</div>
                 <div class="s-item"><div class="s-row"><span class="s-label">Font Size</span> <span class="s-val" id="disp-fs">16px</span></div><input type="range" min="12" max="24" value="16" oninput="upCSS('--letter-font-size', this.value+'px', 'disp-fs')"></div>
             </div>
 
             <div class="s-section-title"><i class="fas fa-eye"></i> Appearance</div>
-            <div class="s-item">
-                <div class="s-row"><span class="s-label">UI Density</span></div>
-                <div class="ls-grp">
-                    <button class="ls-b active" onclick="setDensity('comfortable', this)">Comfortable</button>
-                    <button class="ls-b" onclick="setDensity('compact', this)">Compact</button>
-                </div>
-            </div>
             <div class="s-item">
                 <div class="s-row"><span class="s-label">Font Style</span></div>
                 <div class="ls-grp">
@@ -566,9 +549,6 @@
             <div class="s-item">
                 <div class="s-row"><span class="s-label">Dark Mode</span><div class="toggle"><input type="checkbox" onchange="toggleDark(this.checked)"><span class="slider"></span></div></div>
             </div>
-            <div class="s-item">
-                <div class="s-row"><span class="s-label">Background Animation</span><div class="toggle"><input type="checkbox" checked onchange="toggleAnim(!this.checked)"><span class="slider"></span></div></div>
-            </div>
             
             <button class="reset-btn" onclick="location.reload()"><i class="fas fa-undo"></i> Reset All Settings</button>
         </div>
@@ -583,6 +563,8 @@
                 <div id="lv-singer" style="font-size:12px; opacity:0.7;">Singer</div>
             </div>
             <div style="display:flex; gap:10px;">
+                <!-- Lyrics View Fav Button -->
+                <button class="lv-btn" id="btn-fav-toggle" onclick="toggleFav()"><i class="fas fa-heart"></i></button>
                 <button class="lv-btn" onclick="copyL()" title="Copy Text"><i class="fas fa-copy"></i></button>
                 <button class="lv-btn customize-btn" onclick="toggleLS()" title="Lyrics Settings"><i class="fas fa-font"></i></button>
             </div>
@@ -630,12 +612,7 @@
         <div id="lv-text" class="lv-content"></div>
 
         <div class="rel-sec">
-            <div class="rel-title-row">
-                <div class="rel-title">You Might Also Like</div>
-                <div class="carousel-controls">
-                    <button class="c-btn" onclick="toggleCarousel()" id="c-toggle"><i class="fas fa-pause"></i></button>
-                </div>
-            </div>
+            <div class="rel-title">You Might Also Like</div>
             <div class="carousel-wrap">
                 <div id="rel-track" class="carousel-track"></div>
             </div>
@@ -643,22 +620,26 @@
         
         <!-- Lyrics Page Footer -->
         <footer class="app-footer">
-            <div class="f-grid">
+            <div class="f-container">
                 <div class="f-col">
                     <h4>Kirubai Payanam</h4>
-                    <p>Connecting hearts through Tamil Christian lyrics. Worship without limits.</p>
+                    <p>Sing unto the Lord a new song, for He has done marvelous things.</p>
                 </div>
                 <div class="f-col">
-                    <h4>Share</h4>
-                    <div class="f-social">
-                        <a href="#"><i class="fab fa-whatsapp"></i></a>
-                        <a href="#"><i class="fab fa-telegram"></i></a>
-                    </div>
+                    <h4>Quick Links</h4>
+                    <ul class="f-links">
+                        <li><a href="#" onclick="closeLyrics()">Back to Home</a></li>
+                        <li><a href="#" onclick="dlPDF()">Download PDF</a></li>
+                    </ul>
+                </div>
+                <div class="f-col">
+                    <h4>Contact</h4>
+                    <ul class="f-links">
+                        <li><a href="#">support@kirubaipayanam.com</a></li>
+                    </ul>
                 </div>
             </div>
-            <div class="f-bottom">
-                &copy; 2025 Praise & Worship Team.
-            </div>
+            <div class="f-bottom">&copy; 2025 Praise & Worship Team.</div>
         </footer>
     </div>
 
@@ -682,19 +663,72 @@
         let songs = [];
         let view = 'letter';
         let cat = 'All';
+        let favorites = new Set();
+        let showFavoritesOnly = false;
+        let currentSongId = -1;
+
         const grads = [ "linear-gradient(135deg, #6c5ce7, #a29bfe)", "linear-gradient(135deg, #00b894, #55efc4)", "linear-gradient(135deg, #e17055, #fab1a0)", "linear-gradient(135deg, #0984e3, #74b9ff)", "linear-gradient(135deg, #fd79a8, #e84393)" ];
 
         function init() {
+            // Load favs
+            try {
+                const saved = localStorage.getItem('kp_favs');
+                if(saved) favorites = new Set(JSON.parse(saved));
+            } catch(e) {}
+
             document.querySelectorAll('.s').forEach((el, i) => {
-                // Use innerHTML to preserve <br> tags
                 let content = el.innerHTML;
                 songs.push({
                     id: i, t: el.dataset.t, tn: el.dataset.tn, s: el.dataset.s, c: el.dataset.c, 
-                    l: content, // Keep HTML breaks
-                    bg: grads[i % grads.length]
+                    l: content, bg: grads[i % grads.length]
                 });
             });
             render();
+            updateFavFilterBtn();
+        }
+
+        /* --- FAVORITES LOGIC --- */
+        function toggleFavFilter() {
+            showFavoritesOnly = !showFavoritesOnly;
+            updateFavFilterBtn();
+            render();
+        }
+
+        function updateFavFilterBtn() {
+            const btn = document.getElementById('btn-fav-filter');
+            if(showFavoritesOnly) btn.classList.add('fav-active');
+            else btn.classList.remove('fav-active');
+        }
+
+        function toggleFav(id, e) {
+            // If id is provided, it's from a card click
+            let targetId = (typeof id !== 'undefined') ? id : currentSongId;
+            
+            if(targetId === -1) return;
+            
+            if(favorites.has(targetId)) favorites.delete(targetId);
+            else favorites.add(targetId);
+            
+            // If clicked from card, stop propagation to prevent opening lyrics
+            if(e) e.stopPropagation();
+            
+            // Save
+            localStorage.setItem('kp_favs', JSON.stringify([...favorites]));
+            
+            // UI Update
+            if(currentSongId === targetId) updateFavBtnInLyrics();
+            render(); // Re-render to update heart icons in list
+        }
+
+        function updateFavBtnInLyrics() {
+            const btn = document.getElementById('btn-fav-toggle');
+            if(favorites.has(currentSongId)) {
+                btn.classList.add('liked');
+                btn.innerHTML = '<i class="fas fa-heart"></i>';
+            } else {
+                btn.classList.remove('liked');
+                btn.innerHTML = '<i class="far fa-heart"></i>';
+            }
         }
 
         function setView(v) {
@@ -702,13 +736,14 @@
             document.querySelectorAll('.v-icon-btn').forEach(b => b.classList.remove('active'));
             if(document.getElementById('btn-'+v)) document.getElementById('btn-'+v).classList.add('active');
             render();
-            document.querySelectorAll('.view-settings').forEach(e=>e.classList.remove('active'));
+            document.querySelectorAll('.view-specific-settings').forEach(e=>e.classList.remove('active'));
             if(v==='grid' || v==='list' || v==='letter') document.getElementById('set-'+v).classList.add('active');
         }
 
-        function updateMobileNav(el) {
-            document.querySelectorAll('.m-nav-item').forEach(i => i.classList.remove('active'));
-            el.classList.add('active');
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-actions');
+            if(menu.style.display === 'flex') menu.style.display = 'none';
+            else menu.style.display = 'flex';
         }
 
         function filterCat(c, btn) {
@@ -718,13 +753,7 @@
             render();
         }
 
-        function lev(a, b) {
-            if(a.length==0) return b.length; if(b.length==0) return a.length;
-            var m = []; for(var i=0;i<=b.length;i++) m[i]=[i]; for(var j=0;j<=a.length;j++) m[0][j]=j;
-            for(var i=1;i<=b.length;i++) for(var j=1;j<=a.length;j++) {
-                m[i][j] = b.charAt(i-1)==a.charAt(j-1) ? m[i-1][j-1] : Math.min(m[i-1][j-1]+1, Math.min(m[i][j-1]+1, m[i-1][j]+1));
-            } return m[b.length][a.length];
-        }
+        function lev(a, b) { if(a.length==0)return b.length; if(b.length==0)return a.length; var m=[]; for(var i=0;i<=b.length;i++)m[i]=[i]; for(var j=0;j<=a.length;j++)m[0][j]=j; for(var i=1;i<=b.length;i++)for(var j=1;j<=a.length;j++){ m[i][j]=b.charAt(i-1)==a.charAt(j-1)?m[i-1][j-1]:Math.min(m[i-1][j-1]+1,Math.min(m[i][j-1]+1,m[i-1][j]+1)); } return m[b.length][a.length]; }
 
         function filterSongs() { render(); }
 
@@ -735,6 +764,7 @@
             con.innerHTML = '';
 
             let filtered = songs.filter(s => {
+                if(showFavoritesOnly && !favorites.has(s.id)) return false;
                 if(cat !== 'All' && s.c !== cat) return false;
                 if(q) {
                     if(s.t.toLowerCase().includes(q) || s.tn.toLowerCase().includes(q) || s.l.toLowerCase().includes(q)) return true;
@@ -745,7 +775,10 @@
                 return true;
             });
 
-            if(filtered.length === 0) { con.innerHTML = '<p style="width:100%; text-align:center; padding:30px; opacity:0.6;">No songs found.</p>'; return; }
+            if(filtered.length === 0) { 
+                con.innerHTML = '<p style="width:100%; text-align:center; padding:30px; opacity:0.6;">' + (showFavoritesOnly ? 'No favorites added yet.' : 'No songs found.') + '</p>'; 
+                return; 
+            }
 
             if(view === 'letter') {
                 let grouped = {};
@@ -755,9 +788,18 @@
                     sec.innerHTML = `<div class="letter-head">${l}</div>`;
                     let div = document.createElement('div'); div.className = 'letter-items';
                     grouped[l].forEach(s => {
+                        let isFav = favorites.has(s.id);
                         let it = document.createElement('div'); it.className = 'l-item';
                         it.onclick = () => openL(s.id);
-                        it.innerHTML = `<span class="l-text">${s.t}</span><span class="l-singer">${s.s}</span>`;
+                        it.innerHTML = `
+                            <button class="fav-btn-letter ${isFav?'active':''}" onclick="toggleFav(${s.id}, event)">
+                                <i class="${isFav?'fas':'far'} fa-heart"></i>
+                            </button>
+                            <div class="l-info-wrap">
+                                <span class="l-text">${s.t}</span>
+                                <span class="l-singer">${s.s}</span>
+                            </div>
+                        `;
                         div.appendChild(it);
                     });
                     sec.appendChild(div); con.appendChild(sec);
@@ -766,11 +808,15 @@
             }
 
             filtered.forEach(s => {
+                let isFav = favorites.has(s.id);
                 let d = document.createElement('div'); d.className = 'card';
                 d.onclick = () => openL(s.id);
-                // Strip tags for preview
+                // Strip tags
                 let preview = s.l.replace(/<br>/g, " ").substring(0, 100);
                 d.innerHTML = `
+                    <button class="fav-btn-card ${isFav?'active':''}" onclick="toggleFav(${s.id}, event)">
+                        <i class="${isFav?'fas':'far'} fa-heart"></i>
+                    </button>
                     <div class="card-cover" style="background:${s.bg}"><div class="card-cover-text">${preview}</div></div>
                     <div class="card-body">
                         <div class="song-title">${s.t}</div>
@@ -784,20 +830,20 @@
 
         /* --- LYRICS LOGIC --- */
         function openL(id) {
+            currentSongId = id;
             const s = songs.find(x => x.id === id);
             document.getElementById('lv-title').innerText = s.t;
             document.getElementById('lv-singer').innerText = s.s;
-            document.getElementById('lv-text').innerHTML = s.l; // Use innerHTML
+            document.getElementById('lv-text').innerHTML = s.l;
             
+            updateFavBtnInLyrics();
+
             const track = document.getElementById('rel-track'); track.innerHTML = '';
             let rel = songs.filter(x => x.id !== id).concat(songs.filter(x => x.id !== id));
-            
             rel.forEach(r => {
                 let rc = document.createElement('div'); rc.className = 'rel-card';
                 rc.onclick = () => { openL(r.id); document.getElementById('lyrics-view').scrollTop = 0; };
-                // Strip tags for preview
-                let preview = r.l.replace(/<br>/g, " ").substring(0, 40);
-                rc.innerHTML = `<div class="rel-cover" style="background:${r.bg}">${preview}...</div>
+                rc.innerHTML = `<div class="rel-cover" style="background:${r.bg}">${r.l.replace(/<br>/g," ").substring(0,40)}...</div>
                 <div class="rel-info"><div class="rel-t">${r.t}</div><div class="rel-s">${r.s}</div></div>`;
                 track.appendChild(rc);
             });
@@ -813,68 +859,62 @@
         }
 
         function copyL() {
-            // Get text content (strips tags)
             const t = document.getElementById('lv-text').innerText;
             const ta = document.createElement('textarea'); ta.value = t; document.body.appendChild(ta); ta.select();
             try { document.execCommand('copy'); alert('Copied!'); } catch(e){} document.body.removeChild(ta);
         }
 
+        // Updated PDF Generation with Attractive Style
         function dlPDF() {
-            const t = document.getElementById('lv-title').innerText;
-            const s = document.getElementById('lv-singer').innerText;
-            const l = document.getElementById('lv-text').innerHTML; 
-            
+            const s = songs.find(x => x.id === currentSongId);
             const el = document.createElement('div');
-            el.style.cssText = "padding: 40px; font-family: 'Helvetica', sans-serif; border: 5px solid #6c5ce7; height: 100%; background: #fff;";
             el.innerHTML = `
-                <div style="text-align:center; margin-bottom:30px;">
-                    <h1 style="color:#6c5ce7; margin:0;">${t}</h1>
-                    <h3 style="color:#636e72; font-style:italic; margin-top:5px;">${s}</h3>
-                </div>
-                <hr style="margin:20px 0; border:0; border-top:1px solid #eee;">
-                <div style="font-size:16px; line-height:2; color:#2d3436; text-align:left;">
-                    ${l}
-                </div>
-                <div style="margin-top:50px; font-size:12px; color:#b2bec3; text-align:center;">Generated by Kirubai Payanam App</div>
-            `;
-            html2pdf().set({margin:0.5, filename:t+'.pdf', image:{type:'jpeg',quality:0.98}, html2canvas:{scale:2}}).from(el).save();
+                <div style="padding:40px; font-family:'Poppins', sans-serif; color:#333; border: 5px solid #6c5ce7; padding: 40px; margin: 20px;">
+                    <div style="text-align:center; border-bottom: 2px solid #eee; padding-bottom: 20px; margin-bottom: 30px;">
+                        <h1 style="color:#6c5ce7; margin:0; font-size:32px;">${s.t}</h1>
+                        <p style="color:#666; margin:10px 0 0;">${s.s}</p>
+                    </div>
+                    <div style="font-size:18px; line-height:2; text-align:left;">
+                        ${s.l}
+                    </div>
+                    <div style="text-align:center; margin-top:50px; font-size:12px; color:#aaa;">
+                        - Kirubai Payanam -
+                    </div>
+                </div>`;
+            document.body.appendChild(el); 
+            html2pdf().from(el).save(s.t+'.pdf').then(() => document.body.removeChild(el));
         }
 
+        // Updated HTML Generation with Attractive Style
         function dlHTML() {
-            const t = document.getElementById('lv-title').innerText;
-            const l = document.getElementById('lv-text').innerHTML;
-            const b = new Blob([`<html><head><title>${t}</title></head><body style="font-family:sans-serif; background:#f8f9fd; padding:40px; display:flex; justify-content:center;"><div style="background:white; padding:50px; border-radius:15px; box-shadow:0 10px 40px rgba(0,0,0,0.1); max-width:800px; width:100%; text-align:center;"><h1 style="color:#6c5ce7; margin-bottom:10px;">${t}</h1><hr style="border:0; border-top:1px solid #eee; margin:20px 0;"><div style="font-size:20px; line-height:2.2; color:#333;">${l}</div></div></body></html>`], {type:'text/html'});
-            const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = t+".html"; a.click();
-        }
-
-        /* --- SEARCH TOGGLE --- */
-        function toggleSearch() {
-            const overlay = document.getElementById('search-overlay');
-            const inp = document.getElementById('inp-search');
-            if(overlay.classList.contains('open')) {
-                overlay.classList.remove('open');
-            } else {
-                overlay.classList.add('open');
-                setTimeout(()=>inp.focus(), 100);
-            }
-        }
-
-        function toggleCarousel() {
-            const track = document.getElementById('rel-track');
-            const btn = document.getElementById('c-toggle');
-            if(track.classList.contains('paused')) {
-                track.classList.remove('paused');
-                btn.innerHTML = '<i class="fas fa-pause"></i>';
-            } else {
-                track.classList.add('paused');
-                btn.innerHTML = '<i class="fas fa-play"></i>';
-            }
+            const s = songs.find(x => x.id === currentSongId);
+            const content = `
+                <html>
+                <head><title>${s.t}</title></head>
+                <body style="font-family:'Poppins', sans-serif; padding:40px; background:#f4f4f4; text-align:center;">
+                    <div style="max-width:800px; margin:0 auto; background:white; padding:50px; border-radius:15px; box-shadow:0 10px 30px rgba(0,0,0,0.1); border-top:8px solid #6c5ce7;">
+                        <h1 style="color:#6c5ce7; margin-bottom:10px;">${s.t}</h1>
+                        <p style="color:#888; margin-bottom:40px;">${s.s}</p>
+                        <div style="text-align:left; font-size:18px; line-height:2; color:#333;">
+                            ${s.l}
+                        </div>
+                        <div style="margin-top:40px; color:#ccc; font-size:12px;">Kirubai Payanam Lyrics</div>
+                    </div>
+                </body>
+                </html>`;
+            const b = new Blob([content], {type:'text/html'});
+            const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = s.t+".html"; a.click();
         }
 
         /* --- SETTINGS --- */
+        function toggleSearch() {
+            const o = document.getElementById('search-overlay');
+            if(o.classList.contains('open')) o.classList.remove('open');
+            else { o.classList.add('open'); setTimeout(()=>document.getElementById('inp-search').focus(),100); }
+        }
         function openSettings() { 
             document.getElementById('settings-modal').style.display = 'flex';
-            document.querySelectorAll('.view-settings').forEach(e=>e.classList.remove('active'));
+            document.querySelectorAll('.view-specific-settings').forEach(e=>e.classList.remove('active'));
             if(view === 'grid') document.getElementById('set-grid').classList.add('active');
             else if(view === 'list') document.getElementById('set-list').classList.add('active');
             else if(view === 'letter') document.getElementById('set-letter').classList.add('active');
@@ -885,9 +925,13 @@
         function setTheme(c, el) { document.documentElement.style.setProperty('--primary', c); document.querySelectorAll('.theme-circle').forEach(e=>e.classList.remove('active')); el.classList.add('active'); }
         function toggleDark(v) { if(v) document.documentElement.setAttribute('data-theme', 'dark'); else document.documentElement.removeAttribute('data-theme'); }
         function toggleAnim(v) { if(v) document.body.classList.add('no-anim'); else document.body.classList.remove('no-anim'); }
-        function setDensity(v, el) { document.querySelectorAll('.ls-b').forEach(b => b.classList.remove('active')); el.classList.add('active'); }
-        function setGlobalFont(f, el) { document.body.style.fontFamily = f + ', sans-serif'; }
-        function setBg(v, el) { if(v==='simple') document.body.classList.add('simple-bg'); else document.body.classList.remove('simple-bg'); }
+        function setDensity(v, el) { 
+            document.querySelectorAll('.ls-b').forEach(b => b.classList.remove('active')); el.classList.add('active'); 
+        }
+        function setGlobalFont(f, el) { 
+            document.body.style.fontFamily = f + ', sans-serif'; 
+            document.querySelectorAll('.ls-b').forEach(b => b.classList.remove('active')); el.classList.add('active');
+        }
 
         function toggleLS() {
             const p = document.getElementById('ls-panel'); const b = document.querySelector('.customize-btn');
